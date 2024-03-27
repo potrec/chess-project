@@ -21,18 +21,65 @@
     4 - rook
     5 - queen
     6 - king
+    7 - white
+    8 - black
     */
+    type Figure = {
+        name: number,
+        color: number,
+    }
     const table: number[][] = [
-        [4, 2, 3, 5, 6, 3, 2, 4],
-        [1, 1, 1, 1, 1, 1, 1, 1],
+        [84, 82, 83, 85, 86, 83, 82, 84],
+        [81, 81, 81, 81, 81, 81, 81, 81],
         [0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0],
-        [1, 1, 1, 1, 1, 1, 1, 1],
-        [4, 2, 3, 5, 6, 3, 2, 4]
+        [71, 71, 71, 71, 71, 71, 71, 71],
+        [74, 72, 73, 75, 76, 73, 72, 74]
     ];
+    function getFigures(figure: Figure)
+    {
+        switch(figure)
+        {
+            case (figure.color == 7):
+            {
+                break;
+            }
+            case (figure.color == 8):
+            {
+                break;
+            }
+            default:
+            {
+                break;
+            }
+        }
+        if(figure.name == 1)
+        {
 
+        }
+        else if(figure.name == 2)
+        {
+
+        }
+        else if(figure.name == 3)
+        {
+
+        }
+        else if(figure.name == 4)
+        {
+
+        }
+        else if(figure.name == 5)
+        {
+
+        }
+        else if(figure.name == 6)
+        {
+
+        }
+    }
     console.log(table);
 
 </script>
