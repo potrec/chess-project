@@ -1,13 +1,15 @@
 <template>
   <div class="main-view">
     <SiteNavigation/>
-    <RouterView/>
+    <Board/>
+    <!-- <RouterView/> -->
   </div>
 </template>
 
 <script setup lang="ts">
 import { RouterView } from 'vue-router';
 import  SiteNavigation  from "./components/SiteNavigation.vue";
+import Board from './components/Board.vue';
 </script>
 
 <style scoped>
