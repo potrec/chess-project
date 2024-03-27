@@ -1,4 +1,7 @@
 :root {
-    --main: #769656;
-    --secondary: #3d4436
+    --primary: #769656;
+    --secondary: #eeeed2;
+    --tertiary: #baca44;
+    --white: #ffffff;
+    --black: #000000;
 }
