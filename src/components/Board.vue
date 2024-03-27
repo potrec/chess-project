@@ -4,7 +4,7 @@
             <div class="chess"></div>
         </div>
         <div class="board-container">
-            <div class="board-square" v-for="n in 64">{{ n }}</div>
+            <div class="board-square" v-for="n in 64"><div class="figure"><img src="../assets/images/figures/Chess_bdt45.png"></img></div></div>
         </div>
         <div class="player-container white-player">
             <div class="chess"></div>
