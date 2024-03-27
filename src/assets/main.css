@@ -44,30 +44,33 @@
 }
 .board-container {
     display: flex;
-    width: auto;
     width: 100%;
     aspect-ratio: 1/1;
     flex-wrap: wrap;
     align-content: center;
     justify-content: center;
 }
+.board-line {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
 .board-square {
     width: 12.5%;
-    height: 12.5%;
+    aspect-ratio: 1/1;
     background-color: var(--primary);
 }
-.board-square:nth-child(16n+16),
-.board-square:nth-child(16n+14),
-.board-square:nth-child(16n+12),
-.board-square:nth-child(16n+10),
-.board-square:nth-child(16n+7),
-.board-square:nth-child(16n+5),
-.board-square:nth-child(16n+3),
-.board-square:nth-child(16n+1)
+.board-line:nth-child(even)
+.board-square:nth-child(even)
 {
     background-color: var(--secondary);
 }
-.figure img {
+.board-line:nth-child(odd)
+.board-square:nth-child(odd)
+{
+    background-color: var(--secondary);
+}
+img {
     width: 100%;
     height: 100%;
 }
