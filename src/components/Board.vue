@@ -4,9 +4,11 @@
             <div class="chess"></div>
         </div>
         <div class="board-container">
-            <div class="board-line"v-for="line in table">
-                <div class="board-square" v-for="square in line">
-                    <div class="figure"><img src="../assets/images/figures/Chess_bdt45.png"></img></div>
+            <div class="board-line" v-for="(line, index) in table" :key="index">
+                <div class="board-square" v-for="(square, index) in line" :key="index">
+                    <div class="figure">
+                        <img v-if="getFigures(square) !== ''" :src="getFigures(square)">
+                    </div>
                 </div>
             </div>
         </div>
@@ -32,59 +34,59 @@
         name: number,
         color: number,
     }
-    const table: number[][] = [
-        [84, 82, 83, 85, 86, 83, 82, 84],
-        [81, 81, 81, 81, 81, 81, 81, 81],
-        [0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0],
-        [71, 71, 71, 71, 71, 71, 71, 71],
-        [74, 72, 73, 75, 76, 73, 72, 74]
+    const table: Figure[][] = [
+        [{"name": 4,"color": 8}, {"name": 2,"color": 8}, {"name": 3,"color": 8}, {"name": 5,"color": 8}, {"name": 6,"color": 8}, {"name": 3,"color": 8}, {"name": 2,"color": 8}, {"name": 4,"color": 8}],
+        [{"name": 1,"color": 8}, {"name": 1,"color": 8}, {"name": 1,"color": 8}, {"name": 1,"color": 8}, {"name": 1,"color": 8}, {"name": 1,"color": 8}, {"name": 1,"color": 8}, {"name": 1,"color": 8}],
+        [{"name": 0,"color": 0}, {"name": 0,"color": 0}, {"name": 0,"color": 0}, {"name": 0,"color": 0}, {"name": 0,"color": 0}, {"name": 0,"color": 0}, {"name": 0,"color": 0}, {"name": 0,"color": 0}],
+        [{"name": 0,"color": 0}, {"name": 0,"color": 0}, {"name": 0,"color": 0}, {"name": 0,"color": 0}, {"name": 0,"color": 0}, {"name": 0,"color": 0}, {"name": 0,"color": 0}, {"name": 0,"color": 0}],
+        [{"name": 0,"color": 0}, {"name": 0,"color": 0}, {"name": 0,"color": 0}, {"name": 0,"color": 0}, {"name": 0,"color": 0}, {"name": 0,"color": 0}, {"name": 0,"color": 0}, {"name": 0,"color": 0}],
+        [{"name": 0,"color": 0}, {"name": 0,"color": 0}, {"name": 0,"color": 0}, {"name": 0,"color": 0}, {"name": 0,"color": 0}, {"name": 0,"color": 0}, {"name": 0,"color": 0}, {"name": 0,"color": 0}],
+        [{"name": 1,"color": 7}, {"name": 1,"color": 7}, {"name": 1,"color": 7}, {"name": 1,"color": 7}, {"name": 1,"color": 7}, {"name": 1,"color": 7}, {"name": 1,"color": 7}, {"name": 1,"color": 7}],
+        [{"name": 4,"color": 7}, {"name": 2,"color": 7}, {"name": 3,"color": 7}, {"name": 5,"color": 7}, {"name": 6,"color": 7}, {"name": 3,"color": 7}, {"name": 2,"color": 7}, {"name": 4,"color": 7}]
     ];
-    function getFigures(figure: Figure)
+    console.log(table);
+    function getFigures(figure: Figure): string
     {
-        switch(figure)
-        {
-            case (figure.color == 7):
-            {
-                break;
-            }
-            case (figure.color == 8):
-            {
-                break;
-            }
-            default:
-            {
-                break;
-            }
-        }
+        let path = "/src/assets/images/figures/Chess_";
         if(figure.name == 1)
         {
-
+            path += "p"
         }
         else if(figure.name == 2)
         {
-
+            path += "n"
         }
         else if(figure.name == 3)
         {
-
+            path += "b"
         }
         else if(figure.name == 4)
         {
-
+            path += "r"
         }
         else if(figure.name == 5)
         {
-
+            path += "q"
         }
         else if(figure.name == 6)
         {
-
+            path += "k"
         }
+        else
+        {
+            return "";
+        }
+        if(figure.color == 7)
+        {
+            path += "lt45.png"
+        }
+        else
+        {
+            path += "dt45.png"
+        }
+        console.log(path);
+        return path
     }
-    console.log(table);
 
 </script>
 
