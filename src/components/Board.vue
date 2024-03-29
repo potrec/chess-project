@@ -4,8 +4,8 @@
             <div class="chess"></div>
         </div>
         <div class="board-container">
-            <div class="board-line" v-for="(line, index) in table" :key="index">
-                <div class="board-square" v-for="(figure, index) in line" :key="index">
+            <div class="board-line" v-for="(line, i) in table" :rank="ranks[i]">
+                <div class="board-square" v-for="(figure, j) in line" :rank="ranks[i]" :file="files[j]">
                     <img class="figure" v-if="getFigures(figure) !== ''" :src="getFigures(figure)" v-on:click="showMoves(figure)">
                 </div>
             </div>
@@ -106,7 +106,7 @@
         return path
     }
 
-    function showMoves(figure: Figure, position: Position)
+    function showMoves(figure: Figure)
     {
         console.log(figure)
     }
