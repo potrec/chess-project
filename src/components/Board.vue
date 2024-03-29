@@ -5,10 +5,8 @@
         </div>
         <div class="board-container">
             <div class="board-line" v-for="(line, index) in table" :key="index">
-                <div class="board-square" v-for="(square, index) in line" :key="index">
-                    <div class="figure">
-                        <img v-if="getFigures(square) !== ''" :src="getFigures(square)">
-                    </div>
+                <div class="board-square" v-for="(figure, index) in line" :key="index">
+                    <img class="figure" v-if="getFigures(figure) !== ''" :src="getFigures(figure)" v-on:click="showMoves(figure)">
                 </div>
             </div>
         </div>
@@ -33,17 +31,38 @@
     type Figure = {
         name: number,
         color: number,
+        file: string,
+        rank: number,
     }
-    const table: Figure[][] = [
-        [{"name": 4,"color": 8}, {"name": 2,"color": 8}, {"name": 3,"color": 8}, {"name": 5,"color": 8}, {"name": 6,"color": 8}, {"name": 3,"color": 8}, {"name": 2,"color": 8}, {"name": 4,"color": 8}],
-        [{"name": 1,"color": 8}, {"name": 1,"color": 8}, {"name": 1,"color": 8}, {"name": 1,"color": 8}, {"name": 1,"color": 8}, {"name": 1,"color": 8}, {"name": 1,"color": 8}, {"name": 1,"color": 8}],
-        [{"name": 0,"color": 0}, {"name": 0,"color": 0}, {"name": 0,"color": 0}, {"name": 0,"color": 0}, {"name": 0,"color": 0}, {"name": 0,"color": 0}, {"name": 0,"color": 0}, {"name": 0,"color": 0}],
-        [{"name": 0,"color": 0}, {"name": 0,"color": 0}, {"name": 0,"color": 0}, {"name": 0,"color": 0}, {"name": 0,"color": 0}, {"name": 0,"color": 0}, {"name": 0,"color": 0}, {"name": 0,"color": 0}],
-        [{"name": 0,"color": 0}, {"name": 0,"color": 0}, {"name": 0,"color": 0}, {"name": 0,"color": 0}, {"name": 0,"color": 0}, {"name": 0,"color": 0}, {"name": 0,"color": 0}, {"name": 0,"color": 0}],
-        [{"name": 0,"color": 0}, {"name": 0,"color": 0}, {"name": 0,"color": 0}, {"name": 0,"color": 0}, {"name": 0,"color": 0}, {"name": 0,"color": 0}, {"name": 0,"color": 0}, {"name": 0,"color": 0}],
-        [{"name": 1,"color": 7}, {"name": 1,"color": 7}, {"name": 1,"color": 7}, {"name": 1,"color": 7}, {"name": 1,"color": 7}, {"name": 1,"color": 7}, {"name": 1,"color": 7}, {"name": 1,"color": 7}],
-        [{"name": 4,"color": 7}, {"name": 2,"color": 7}, {"name": 3,"color": 7}, {"name": 5,"color": 7}, {"name": 6,"color": 7}, {"name": 3,"color": 7}, {"name": 2,"color": 7}, {"name": 4,"color": 7}]
-    ];
+    const table: Figure[][] = [];
+
+    const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+    const ranks = [8, 7, 6, 5, 4, 3, 2, 1];
+
+    for (let rank of ranks) {
+        const row: Figure[] = [];
+        for (let file of files) {
+            const color = (rank > 2 && rank < 7) ? 0 : (rank > 2 ? 7 : 8);
+            let name = 0;
+            if (rank === 2 || rank === 7) {
+                name = 1;
+            } else if ((rank === 1 && (file === 'a' || file === 'h')) || (rank === 8 && (file === 'a' || file === 'h'))) {
+                name = 4;
+            } else if ((rank === 1 && (file === 'b' || file === 'g')) || (rank === 8 && (file === 'b' || file === 'g'))) {
+                name = 2;
+            } else if ((rank === 1 && (file === 'c' || file === 'f')) || (rank === 8 && (file === 'c' || file === 'f'))) {
+                name = 3;
+            } else if ((rank === 1 && file === 'd') || (rank === 8 && file === 'd')) {
+                name = 5;
+            } else if ((rank === 1 && file === 'e') || (rank === 8 && file === 'e')) {
+                name = 6;
+            }
+
+            row.push({ name, color, file, rank});
+        }
+        table.push(row);
+    }
+
     console.log(table);
     function getFigures(figure: Figure): string
     {
@@ -84,8 +103,12 @@
         {
             path += "dt45.png"
         }
-        console.log(path);
         return path
+    }
+
+    function showMoves(figure: Figure, position: Position)
+    {
+        console.log(figure)
     }
 
 </script>
