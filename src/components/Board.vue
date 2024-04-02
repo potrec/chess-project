@@ -4,9 +4,9 @@
             <div class="chess"></div>
         </div>
         <div class="board-container">
-            <div class="board-line" v-for="(line, i) in table" :rank="ranks[i]">
-                <div class="board-square" v-for="(figure, j) in line" :rank="ranks[i]" :file="files[j]">
-                    <img class="figure" v-if="getFigures(figure) !== ''" :src="getFigures(figure)" v-on:click="showMoves(figure)">
+            <div class="board-line" v-for="(line, i) in table">
+                <div class="board-square" v-for="(figure, j) in line" :ref="squareRefs[i*8+j]">
+                    <img class="figure" v-if="getFigures(figure) !== ''" :src="getFigures(figure)" @click="showMoves(figure,i,j)">
                 </div>
             </div>
         </div>
@@ -17,6 +17,8 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue';
+
     /*
     0 - clear board
     1 - pawn
@@ -38,6 +40,13 @@
 
     const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
     const ranks = [8, 7, 6, 5, 4, 3, 2, 1];
+    const squareRefs = ref([]);
+
+    for (let i = 0; i < 8; i++) {
+        for (let j = 0; j < 8; j++) {
+        squareRefs.value.push(ref(null));
+        }
+    }
 
     for (let rank of ranks) {
         const row: Figure[] = [];
@@ -63,7 +72,6 @@
         table.push(row);
     }
 
-    console.log(table);
     function getFigures(figure: Figure): string
     {
         let path = "/src/assets/images/figures/Chess_";
@@ -106,9 +114,44 @@
         return path
     }
 
-    function showMoves(figure: Figure)
+    function showMoves(figure: Figure,i: number,j: number)
     {
         console.log(figure)
+        
+        const square = squareRefs.value[i*8+j]
+        console.log(square._rawValue[0].style);
+        square._rawValue[0].style.backgroundColor = 'lightblue';
+        console.log(calculateMoves(figure));
+    }
+    /*
+    0 - can't move there
+    1 - can move there
+    2 - can move there and destroy figure
+    3 - can move there and transform into a new figure
+    */
+    function calculateMoves(figure: Figure)
+    {
+        let movesTable:number[][] = Array(8).fill(0).map(() => Array(8).fill(0));
+        console.log("file: "+figure.file + " rank: " + figure.rank + " name:" + figure.name)
+        if(figure.name === 1)
+        {
+            movesTable[ranks.indexOf(figure.rank)-1][files.indexOf(figure.file)] = 1;
+            movesTable[ranks.indexOf(figure.rank)-2][files.indexOf(figure.file)] = 1;
+            movesTable[ranks.indexOf(figure.rank)-1][files.indexOf(figure.file)+1] = 1;// right slant
+            movesTable[ranks.indexOf(figure.rank)-1][files.indexOf(figure.file)-1] = 1;// left slant
+        }
+        if(figure.name === 2)
+        {
+            movesTable[ranks.indexOf(figure.rank)-2][files.indexOf(figure.file)+1] = 1;
+            movesTable[ranks.indexOf(figure.rank)-2][files.indexOf(figure.file)-1] = 1;
+            movesTable[ranks.indexOf(figure.rank)-1][files.indexOf(figure.file)+2] = 1;
+            movesTable[ranks.indexOf(figure.rank)-1][files.indexOf(figure.file)-2] = 1;
+        }
+        if(figure.name === 3)
+        {
+
+        }
+        return {movesTable,figure};
     }
 
 </script>
