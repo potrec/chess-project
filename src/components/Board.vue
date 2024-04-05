@@ -1,97 +1,123 @@
 <template>
     <div class="main-container">
-        <!-- <div class="player-container black-player">
-            <div class="chess"></div>
-        </div>
-        <div class="board-container">
-            <div class="board-line" v-for="(line, i) in table">
-                <div class="board-square" v-for="(figure, j) in line" :ref="squareRefs[i*8+j]">
-                    <img class="figure" v-if="getFigures(figure) !== ''" :src="getFigures(figure)" @click="showMoves(figure,i,j)">
-                </div>
-            </div>
-        </div>
-        <div class="player-container white-player">
-            <div class="chess"></div>
-        </div> -->
+       <div class="board-container">
+         <div class="board-line" v-for="(line, i) in board.squares" :key="i">
+            <div class="board-square" v-for="(square, j) in line" :key="j">
+                <img class="figure" v-if="square" :src="getFigures(square)" @click="showMoves(square, i, j)">
+           </div>
+         </div>
+       </div>
     </div>
 </template>
+   
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import { isUpperCase} from '../helpers/isUpperCase';
+import { ref, reactive } from 'vue';
+import { isUpperCase } from '../helpers/isUpperCase';
 
-    type Figure = {
-        name: number,
-        color: number,
-        file: string,
-        rank: number,
-    }
-    enum FigureColor {
-        White = 8,
-        Black = 16,
-    }
-    enum FigureType {
-        ClearBoard = 0,
-        King = 1,
-        Knight = 3,
-        Pawn = 2,
-        Bishop = 4,
-        Rook = 5,
-        Queen = 6,
-        
-    }
-    type FenNotationType = {
-        figure: FigureType,
-        string: string,
-    }
-    const pieceTypeFromSymbol: FenNotationType[] = [
-    { figure: FigureType.ClearBoard, string: "" },
-    { figure: FigureType.King, string: "k" },
-    { figure: FigureType.Knight, string: "n" },
-    { figure: FigureType.Pawn, string: "p" },
-    { figure: FigureType.Bishop, string: "b" },
-    { figure: FigureType.Rook, string: "r" },
-    { figure: FigureType.Queen, string: "q" },
-    ];
+const board = reactive({
+ squares: Array.from({ length: 8 }, () => Array(8).fill(null)),
+});
 
-    const startFEN: string = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-    loadPositionFromFen(startFEN);
-    function loadPositionFromFen(fen: string)
-    {
-        let fenBoard: string = fen.split(' ')[0];
-        let file: number = 0;
-        let rank: number = 7;
-        var pieceColor = null;
-        var pieceType = null;
-        for(let symbol of fenBoard)
-        {
-            if(symbol === "/")
-            {
-                file = 0;
-                rank--;
-            } 
-            else 
-            {
-                if(Number(symbol))
-                {
-                    file += Number(symbol);
-                }
-                else
-                {
-                    pieceColor = isUpperCase(symbol) ? FigureColor.White : FigureColor.Black;
-                    pieceType = getFigureTypeByString(symbol.toLowerCase());
-                    file++;
-                }
-                console.log(pieceColor,pieceType);
-            }
-        }
-    }
+console.log(board);
 
-    function getFigureTypeByString(fenSymbol: string): FigureType | undefined 
-    {
-        const piece = pieceTypeFromSymbol.find(item => item.string === fenSymbol);
-        return piece ? piece.figure : undefined;
+type Figure = {
+ type: FigureType,
+ color: FigureColor,
+ file: string,
+ rank: number,
+}
+
+enum FigureColor {
+ White = 0,
+ Black = 1,
+}
+
+enum FigureType {
+ ClearBoard = 0,
+ King = 1,
+ Knight = 3,
+ Pawn = 2,
+ Bishop = 4,
+ Rook = 5,
+ Queen = 6,
+}
+
+const pieceTypeFromSymbol: FenNotationType[] = [
+ { figure: FigureType.ClearBoard, string: "" },
+ { figure: FigureType.King, string: "k" },
+ { figure: FigureType.Knight, string: "n" },
+ { figure: FigureType.Pawn, string: "p" },
+ { figure: FigureType.Bishop, string: "b" },
+ { figure: FigureType.Rook, string: "r" },
+ { figure: FigureType.Queen, string: "q" },
+];
+
+const startFEN: string = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+// const otherFEN: string = "r1bk3r/p2pBpNp/n4n2/1p1NP2P/6P1/3P4/P1P1K3/q5b1 b - - 1 23"
+loadPositionFromFen(startFEN);
+
+function loadPositionFromFen(fen: string) {
+ let fenBoard: string = fen.split(' ')[0];
+ let file: number = 0;
+ let rank: number = 7;
+ for (let symbol of fenBoard) {
+    if (symbol === "/") {
+      file = 0;
+      rank--;
+    } else {
+      if (Number(symbol)) {
+        file += Number(symbol);
+      } else {
+        var pieceColor = isUpperCase(symbol) ? FigureColor.White : FigureColor.Black;
+        var pieceType = getFigureTypeByString(symbol.toLowerCase());
+        console.log(pieceColor + " " + pieceType);
+        board.squares[rank][file] = {
+          type: pieceType,
+          color: pieceColor,
+          file: String.fromCharCode(97 + file),
+          rank: rank + 1,
+        };
+        console.log(board);
+        file++;
+      }
     }
+ }
+}
+
+function getFigureTypeByString(fenSymbol: string): FigureType | undefined {
+ var piece = pieceTypeFromSymbol.find(item => item.string === fenSymbol);
+ return piece ? piece.figure : undefined;
+}
+
+function getFigures(figure: Figure): string {
+ let path = "/src/assets/images/figures/Chess_";
+ switch (figure.type) {
+    case FigureType.King:
+      path += "k";
+      break;
+    case FigureType.Queen:
+      path += "q";
+      break;
+    case FigureType.Rook:
+      path += "r";
+      break;
+    case FigureType.Bishop:
+      path += "b";
+      break;
+    case FigureType.Knight:
+      path += "n";
+      break;
+    case FigureType.Pawn:
+      path += "p";
+      break;
+    default:
+      return "";
+ }
+ path += figure.color === FigureColor.White ? "lt45.png" : "dt45.png";
+ return path;
+}
+
 
     // const table: Figure[][] = [];
 
