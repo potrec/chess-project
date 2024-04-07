@@ -2,12 +2,20 @@
   <div class="main-container">
     <div class="board-container">
       <div class="board-line" v-for="(line, i) in board.squares" :key="i">
-        <div class="board-square" v-for="(square, j) in line" :key="j" :index="64 - j - i * 8">
+        <div
+          class="board-square"
+          v-for="(square, j) in line"
+          :key="j"
+          :index="64 - j - i * 8"
+          draggable="false"
+        >
           <img
             class="figure"
             v-if="square"
             :src="getFigures(square)"
             @click="showMoves(square, i, j)"
+            draggable="true"
+            v-on:dragstart="handleDragStart($event, square)"
           />
         </div>
       </div>
@@ -128,6 +136,15 @@ function getFigures(figure: Figure): string {
   }
   path += figure.color === FigureColor.White ? 'lt45.png' : 'dt45.png'
   return path
+}
+
+function handleDragStart(event: MouseEvent, figure: Figure) {
+  console.log(event, figure)
+}
+
+function handleDragEnd(event: MouseEvent, figure: Figure) {
+  //todo: handle the correct moves of the figures
+  //handle delete of image that is under without the image that we are currently dragging
 }
 
 // function precomputedMoveData() {
