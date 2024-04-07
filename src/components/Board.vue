@@ -2,7 +2,7 @@
   <div class="main-container">
     <div class="board-container">
       <div class="board-line" v-for="(line, i) in board.squares" :key="i">
-        <div class="board-square" v-for="(square, j) in line" :key="j">
+        <div class="board-square" v-for="(square, j) in line" :key="j" :index="64 - j - i * 8">
           <img
             class="figure"
             v-if="square"
@@ -22,6 +22,9 @@ import { isUpperCase } from '../helpers/isUpperCase'
 const board = reactive({
   squares: Array.from({ length: 8 }, () => Array(8).fill(null))
 })
+
+const directionOffsets: number[] = [8, -8, -1, 1, 7, -7, 9, -9]
+// const numSquaresToEdge: number[][]
 
 console.log(board)
 
@@ -65,7 +68,7 @@ const pieceTypeFromSymbol: FenNotationType[] = [
 const startFEN: string = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
 // const otherFEN: string = "r1bk3r/p2pBpNp/n4n2/1p1NP2P/6P1/3P4/P1P1K3/q5b1 b - - 1 23"
 loadPositionFromFen(startFEN)
-
+// precomputedMoveData()
 function loadPositionFromFen(fen: string) {
   let fenBoard: string = fen.split(' ')[0]
   let file: number = 0
@@ -126,6 +129,29 @@ function getFigures(figure: Figure): string {
   path += figure.color === FigureColor.White ? 'lt45.png' : 'dt45.png'
   return path
 }
+
+// function precomputedMoveData() {
+//   for (let file = 0; file < 8; file++) {
+//     for (let rank = 0; rank < 8; rank++) {
+//       let numNorth: number = 7 - rank
+//       let numSouth: number = rank
+//       let numWest: number = file
+//       let numEast: number = 7 - file
+//       let squareIndex = rank * 8 + file
+
+//       numSquaresToEdge[squareIndex] = [
+//         numNorth,
+//         numSouth,
+//         numWest,
+//         numEast,
+//         Math.min(numNorth, numWest),
+//         Math.min(numSouth, numEast),
+//         Math.min(numNorth, numEast),
+//         Math.min(numSouth, numWest)
+//       ]
+//     }
+//   }
+// }
 // function showMoves(figure: Figure,i: number,j: number)
 // {
 //     console.log(figure)
