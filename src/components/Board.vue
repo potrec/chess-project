@@ -8,12 +8,13 @@
           :key="j"
           :index="64 - j - i * 8"
           draggable="false"
+          v-on:dragenter="handleDragEnter($event, square, i, j)"
+          v-on:dragend="handleDragEnd($event, square)"
         >
           <img
             class="figure"
             v-if="square"
             :src="getFigures(square)"
-            @click="showMoves(square, i, j)"
             draggable="true"
             v-on:dragstart="handleDragStart($event, square)"
           />
@@ -27,7 +28,7 @@
 import { ref, reactive } from 'vue'
 import { isUpperCase } from '../helpers/isUpperCase'
 
-const board = reactive({
+var board = reactive({
   squares: Array.from({ length: 8 }, () => Array(8).fill(null))
 })
 
@@ -46,6 +47,11 @@ type Figure = {
 type FenNotationType = {
   figure: FigureType
   string: string
+}
+
+type TempFigure = {
+  i: number
+  j: number
 }
 
 enum FigureColor {
@@ -91,14 +97,12 @@ function loadPositionFromFen(fen: string) {
       } else {
         var pieceColor = isUpperCase(symbol) ? FigureColor.White : FigureColor.Black
         var pieceType = getFigureTypeByString(symbol.toLowerCase())
-        console.log(pieceColor + ' ' + pieceType)
         board.squares[rank][file] = {
           type: pieceType,
           color: pieceColor,
           file: String.fromCharCode(97 + file),
           rank: rank + 1
         }
-        console.log(board)
         file++
       }
     }
@@ -138,13 +142,33 @@ function getFigures(figure: Figure): string {
   return path
 }
 
+var dragStartSquare: Figure
+var dragEndSquare: TempFigure
+
 function handleDragStart(event: MouseEvent, figure: Figure) {
-  console.log(event, figure)
+  dragStartSquare = figure
 }
 
 function handleDragEnd(event: MouseEvent, figure: Figure) {
-  //todo: handle the correct moves of the figures
-  //handle delete of image that is under without the image that we are currently dragging
+  board.squares[dragEndSquare.i][dragEndSquare.j] = figure
+  console.log(board)
+  deleteFigureImage()
+  addFigureImage()
+  //todo later: handle the correct moves of the figures
+}
+
+function handleDragEnter(event: MouseEvent, figure: Figure, i: number, j: number) {
+  event.preventDefault()
+  dragEndSquare = { i: i, j: j }
+  console.log('drag enter\n', event, figure, `i:${i} j:${j}`)
+}
+
+function deleteFigureImage() {
+  //delete the img from the square
+}
+
+function addFigureImage() {
+  //add img of the figure in the board
 }
 
 // function precomputedMoveData() {
