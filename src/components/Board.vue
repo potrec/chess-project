@@ -10,6 +10,7 @@
           draggable="false"
           v-on:dragenter="handleDragEnter($event, square, i, j)"
           v-on:dragend="handleDragEnd($event, square)"
+          @click="onClick(square)"
         >
           <img
             class="figure"
@@ -37,6 +38,7 @@ const directionOffsets: number[] = [8, -8, -1, 1, 7, -7, 9, -9]
 
 console.log(board)
 
+// todo: organize this mess !!!
 type Figure = {
   type: FigureType
   color: FigureColor
@@ -80,17 +82,17 @@ const pieceTypeFromSymbol: FenNotationType[] = [
 ]
 
 const startFEN: string = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
-// const otherFEN: string = "r1bk3r/p2pBpNp/n4n2/1p1NP2P/6P1/3P4/P1P1K3/q5b1 b - - 1 23"
+//const otherFEN: string = 'r1bk3r/p2pBpNp/n4n2/1p1NP2P/6P1/3P4/P1P1K3/q5b1 b - - 1 23'
 loadPositionFromFen(startFEN)
-// precomputedMoveData()
 function loadPositionFromFen(fen: string) {
+  board.squares = Array.from({ length: 8 }, () => Array(8).fill(null))
   let fenBoard: string = fen.split(' ')[0]
   let file: number = 0
-  let rank: number = 7
+  let rank: number = 0
   for (let symbol of fenBoard) {
     if (symbol === '/') {
       file = 0
-      rank--
+      rank++
     } else {
       if (Number(symbol)) {
         file += Number(symbol)
@@ -101,7 +103,7 @@ function loadPositionFromFen(fen: string) {
           type: pieceType,
           color: pieceColor,
           file: String.fromCharCode(97 + file),
-          rank: rank + 1
+          rank: rank
         }
         file++
       }
@@ -151,24 +153,33 @@ function handleDragStart(event: MouseEvent, figure: Figure) {
 
 function handleDragEnd(event: MouseEvent, figure: Figure) {
   board.squares[dragEndSquare.i][dragEndSquare.j] = figure
-  console.log(board)
-  deleteFigureImage()
+  if (
+    dragStartSquare.rank != dragEndSquare.i ||
+    dragStartSquare.file.charCodeAt(0) - 97 != dragEndSquare.j
+  ) {
+    deleteFigureImage()
+    figure.rank = dragEndSquare.i
+    figure.file = dragStartSquare.file
+  }
   addFigureImage()
-  //todo later: handle the correct moves of the figures
+  //todo: handle the correct moves of the figures
 }
 
 function handleDragEnter(event: MouseEvent, figure: Figure, i: number, j: number) {
   event.preventDefault()
   dragEndSquare = { i: i, j: j }
-  console.log('drag enter\n', event, figure, `i:${i} j:${j}`)
 }
 
 function deleteFigureImage() {
-  //delete the img from the square
+  board.squares[dragStartSquare.rank][dragStartSquare.file.charCodeAt(0) - 97] = null
 }
 
 function addFigureImage() {
   //add img of the figure in the board
+}
+
+function onClick(figure: Figure) {
+  console.log(figure)
 }
 
 // function precomputedMoveData() {
