@@ -6,7 +6,7 @@
           class="board-square"
           v-for="(square, j) in line"
           :key="j"
-          :index="64 - j - i * 8"
+          :index="64 - (8 - j) - i * 8"
           draggable="false"
           v-on:dragenter="handleDragEnter($event, square, i, j)"
           v-on:dragend="handleDragEnd($event, square)"
@@ -153,6 +153,7 @@ function handleDragStart(event: MouseEvent, figure: Figure) {
 
 function handleDragEnd(event: MouseEvent, figure: Figure) {
   board.squares[dragEndSquare.i][dragEndSquare.j] = figure
+  calculateMoves(figure)
   if (
     dragStartSquare.rank != dragEndSquare.i ||
     dragStartSquare.file.charCodeAt(0) - 97 != dragEndSquare.j
@@ -180,6 +181,13 @@ function addFigureImage() {
 
 function onClick(figure: Figure) {
   console.log(figure)
+}
+
+function calculateMoves(figure: Figure): boolean {
+  let indexOfTheFigure =
+    64 - (8 - (dragStartSquare.file.charCodeAt(0) - 97)) - dragStartSquare.rank * 8
+  console.log(indexOfTheFigure)
+  return true
 }
 
 // function precomputedMoveData() {
