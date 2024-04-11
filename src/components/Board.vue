@@ -34,9 +34,21 @@ var board = reactive({
 })
 
 const directionOffsets: number[] = [8, -8, -1, 1, 7, -7, 9, -9]
-// const numSquaresToEdge: number[][]
-
+const arrayOfSquaresToEdge: numSquaresToEdge[] = []
+precomputedMoveData()
+console.log(arrayOfSquaresToEdge)
 console.log(board)
+
+type numSquaresToEdge = {
+  numNorth: number
+  numSouth: number
+  numWest: number
+  numEast: number
+  minNW: number
+  minSE: number
+  minNE: number
+  minSW: number
+}
 
 // todo: organize this mess !!!
 type Figure = {
@@ -54,6 +66,11 @@ type FenNotationType = {
 type TempFigure = {
   i: number
   j: number
+}
+
+type Move = {
+  startSquare: number
+  targetSquare: number
 }
 
 enum FigureColor {
@@ -189,29 +206,41 @@ function calculateMoves(figure: Figure): boolean {
   console.log(indexOfTheFigure)
   return true
 }
+generateMoves()
+function generateMoves() {
+  var moves: Move[] = null
+  for (var startSquare = 0; startSquare < 64; startSquare++) {
+    var piece = board.squares[Math.floor(startSquare / 8)][startSquare % 8]
+    console.log(piece)
+  }
+  // return moves
+}
 
-// function precomputedMoveData() {
-//   for (let file = 0; file < 8; file++) {
-//     for (let rank = 0; rank < 8; rank++) {
-//       let numNorth: number = 7 - rank
-//       let numSouth: number = rank
-//       let numWest: number = file
-//       let numEast: number = 7 - file
-//       let squareIndex = rank * 8 + file
-
-//       numSquaresToEdge[squareIndex] = [
-//         numNorth,
-//         numSouth,
-//         numWest,
-//         numEast,
-//         Math.min(numNorth, numWest),
-//         Math.min(numSouth, numEast),
-//         Math.min(numNorth, numEast),
-//         Math.min(numSouth, numWest)
-//       ]
-//     }
-//   }
-// }
+function precomputedMoveData() {
+  for (let file = 0; file < 8; file++) {
+    for (let rank = 0; rank < 8; rank++) {
+      let numNorth: number = 7 - rank
+      let numSouth: number = rank
+      let numWest: number = file
+      let numEast: number = 7 - file
+      let squareIndex = rank * 8 + file
+      let minNW: number = Math.min(numNorth, numWest)
+      let minSE: number = Math.min(numSouth, numEast)
+      let minNE: number = Math.min(numNorth, numEast)
+      let minSW: number = Math.min(numSouth, numWest)
+      arrayOfSquaresToEdge[squareIndex] = {
+        numNorth: numNorth,
+        numSouth: numSouth,
+        numWest: numWest,
+        numEast: numEast,
+        minNW: minNW,
+        minSE: minSE,
+        minNE: minNE,
+        minSW: minSW
+      }
+    }
+  }
+}
 // function showMoves(figure: Figure,i: number,j: number)
 // {
 //     console.log(figure)
