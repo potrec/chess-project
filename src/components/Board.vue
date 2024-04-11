@@ -2,12 +2,22 @@
   <div class="main-container">
     <div class="board-container">
       <div class="board-line" v-for="(line, i) in board.squares" :key="i">
-        <div class="board-square" v-for="(square, j) in line" :key="j" :index="64 - j - i * 8">
+        <div
+          class="board-square"
+          v-for="(square, j) in line"
+          :key="j"
+          :index="64 - j - i * 8"
+          draggable="false"
+          v-on:dragenter="handleDragEnter($event, square, i, j)"
+          v-on:dragend="handleDragEnd($event, square)"
+          @click="onClick(square)"
+        >
           <img
             class="figure"
             v-if="square"
             :src="getFigures(square)"
-            @click="showMoves(square, i, j)"
+            draggable="true"
+            v-on:dragstart="handleDragStart($event, square)"
           />
         </div>
       </div>
@@ -19,7 +29,7 @@
 import { ref, reactive } from 'vue'
 import { isUpperCase } from '../helpers/isUpperCase'
 
-const board = reactive({
+var board = reactive({
   squares: Array.from({ length: 8 }, () => Array(8).fill(null))
 })
 
@@ -28,6 +38,7 @@ const directionOffsets: number[] = [8, -8, -1, 1, 7, -7, 9, -9]
 
 console.log(board)
 
+// todo: organize this mess !!!
 type Figure = {
   type: FigureType
   color: FigureColor
@@ -38,6 +49,11 @@ type Figure = {
 type FenNotationType = {
   figure: FigureType
   string: string
+}
+
+type TempFigure = {
+  i: number
+  j: number
 }
 
 enum FigureColor {
@@ -66,31 +82,29 @@ const pieceTypeFromSymbol: FenNotationType[] = [
 ]
 
 const startFEN: string = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
-// const otherFEN: string = "r1bk3r/p2pBpNp/n4n2/1p1NP2P/6P1/3P4/P1P1K3/q5b1 b - - 1 23"
+//const otherFEN: string = 'r1bk3r/p2pBpNp/n4n2/1p1NP2P/6P1/3P4/P1P1K3/q5b1 b - - 1 23'
 loadPositionFromFen(startFEN)
-// precomputedMoveData()
 function loadPositionFromFen(fen: string) {
+  board.squares = Array.from({ length: 8 }, () => Array(8).fill(null))
   let fenBoard: string = fen.split(' ')[0]
   let file: number = 0
-  let rank: number = 7
+  let rank: number = 0
   for (let symbol of fenBoard) {
     if (symbol === '/') {
       file = 0
-      rank--
+      rank++
     } else {
       if (Number(symbol)) {
         file += Number(symbol)
       } else {
         var pieceColor = isUpperCase(symbol) ? FigureColor.White : FigureColor.Black
         var pieceType = getFigureTypeByString(symbol.toLowerCase())
-        console.log(pieceColor + ' ' + pieceType)
         board.squares[rank][file] = {
           type: pieceType,
           color: pieceColor,
           file: String.fromCharCode(97 + file),
-          rank: rank + 1
+          rank: rank
         }
-        console.log(board)
         file++
       }
     }
@@ -128,6 +142,44 @@ function getFigures(figure: Figure): string {
   }
   path += figure.color === FigureColor.White ? 'lt45.png' : 'dt45.png'
   return path
+}
+
+var dragStartSquare: Figure
+var dragEndSquare: TempFigure
+
+function handleDragStart(event: MouseEvent, figure: Figure) {
+  dragStartSquare = figure
+}
+
+function handleDragEnd(event: MouseEvent, figure: Figure) {
+  board.squares[dragEndSquare.i][dragEndSquare.j] = figure
+  if (
+    dragStartSquare.rank != dragEndSquare.i ||
+    dragStartSquare.file.charCodeAt(0) - 97 != dragEndSquare.j
+  ) {
+    deleteFigureImage()
+    figure.rank = dragEndSquare.i
+    figure.file = String.fromCharCode(97 + dragEndSquare.j)
+  }
+  addFigureImage()
+  //todo: handle the correct moves of the figures
+}
+
+function handleDragEnter(event: MouseEvent, figure: Figure, i: number, j: number) {
+  event.preventDefault()
+  dragEndSquare = { i: i, j: j }
+}
+
+function deleteFigureImage() {
+  board.squares[dragStartSquare.rank][dragStartSquare.file.charCodeAt(0) - 97] = null
+}
+
+function addFigureImage() {
+  //add img of the figure in the board
+}
+
+function onClick(figure: Figure) {
+  console.log(figure)
 }
 
 // function precomputedMoveData() {
