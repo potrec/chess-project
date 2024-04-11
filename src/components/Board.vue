@@ -159,7 +159,7 @@ function handleDragEnd(event: MouseEvent, figure: Figure) {
   ) {
     deleteFigureImage()
     figure.rank = dragEndSquare.i
-    figure.file = dragStartSquare.file
+    figure.file = String.fromCharCode(97 + dragEndSquare.j)
   }
   addFigureImage()
   //todo: handle the correct moves of the figures
