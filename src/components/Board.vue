@@ -10,7 +10,7 @@
           draggable="false"
           v-on:dragenter="handleDragEnter($event, square, i, j)"
           v-on:dragend="handleDragEnd($event, square)"
-          @click="onClick(square)"
+          @click="onClick(square, 64 - (8 - j) - i * 8)"
         >
           <img
             class="figure"
@@ -35,6 +35,9 @@ var board = reactive({
 
 const directionOffsets: number[] = [8, -8, -1, 1, 7, -7, 9, -9]
 const arrayOfSquaresToEdge: numSquaresToEdge[] = []
+let playerColor = FigureColor.White
+let currentPlayer = FigureColor.White
+let opponentColor = FigureColor.Black
 precomputedMoveData()
 console.log(arrayOfSquaresToEdge)
 console.log(board)
@@ -170,7 +173,7 @@ function handleDragStart(event: MouseEvent, figure: Figure) {
 
 function handleDragEnd(event: MouseEvent, figure: Figure) {
   board.squares[dragEndSquare.i][dragEndSquare.j] = figure
-  calculateMoves(figure)
+  calculateMoves()
   if (
     dragStartSquare.rank != dragEndSquare.i ||
     dragStartSquare.file.charCodeAt(0) - 97 != dragEndSquare.j
@@ -196,24 +199,87 @@ function addFigureImage() {
   //add img of the figure in the board
 }
 
-function onClick(figure: Figure) {
-  console.log(figure)
+function onClick(figure: Figure, index: number) {
+  console.log(figure, index)
 }
 
-function calculateMoves(figure: Figure): boolean {
+function calculateMoves(): boolean {
   let indexOfTheFigure =
     64 - (8 - (dragStartSquare.file.charCodeAt(0) - 97)) - dragStartSquare.rank * 8
   console.log(indexOfTheFigure)
+  let indexOfTheEndSquare = 64 - (8 - dragEndSquare.j) - dragEndSquare.i * 8
+  console.log(indexOfTheEndSquare)
+  if (indexOfTheEndSquare - indexOfTheFigure == 8) {
+    console.log('move up')
+  }
   return true
 }
 generateMoves()
 function generateMoves() {
-  var moves: Move[] = null
   for (var startSquare = 0; startSquare < 64; startSquare++) {
-    var piece = board.squares[Math.floor(startSquare / 8)][startSquare % 8]
+    var piece = getFigureByIndex(startSquare)
+    if (piece == null) {
+      break
+    }
+    if (piece.type == FigureType.Bishop) {
+      generateSlidingMoves(startSquare)
+    }
     console.log(piece)
   }
   // return moves
+}
+
+function generateSlidingMoves(startSquare: number): Move[] {
+  let moves: Move[] = []
+  for (let directionIndex = 0; directionIndex < 8; directionIndex++) {
+    let numberOfSquaresInDirection = getNumberOfSquaresInDirection(startSquare, directionIndex)
+    for (let n = 0; n < numberOfSquaresInDirection; n++) {
+      let targetSquare = startSquare + directionOffsets[directionIndex] * (n + 1)
+      let figure = getFigureByIndex(startSquare)
+      if (playerColor == figure.color) {
+        break
+      }
+      moves.push({ startSquare, targetSquare })
+      if (playerColor == opponentColor) {
+        break
+      }
+    }
+  }
+  console.log('moves:', moves)
+  return moves
+}
+
+function getNumberOfSquaresInDirection(startSquare: number, directionIndex: number): number {
+  let numberOfSquaresInDirection = 0
+  switch (directionIndex) {
+    case 0:
+      numberOfSquaresInDirection = arrayOfSquaresToEdge[startSquare].numNorth
+      break
+    case 1:
+      numberOfSquaresInDirection = arrayOfSquaresToEdge[startSquare].numSouth
+      break
+    case 2:
+      numberOfSquaresInDirection = arrayOfSquaresToEdge[startSquare].numWest
+      break
+    case 3:
+      numberOfSquaresInDirection = arrayOfSquaresToEdge[startSquare].numEast
+      break
+    case 4:
+      numberOfSquaresInDirection = arrayOfSquaresToEdge[startSquare].minNW
+      break
+    case 5:
+      numberOfSquaresInDirection = arrayOfSquaresToEdge[startSquare].minSE
+      break
+    case 6:
+      numberOfSquaresInDirection = arrayOfSquaresToEdge[startSquare].minNE
+      break
+    case 7:
+      numberOfSquaresInDirection = arrayOfSquaresToEdge[startSquare].minSW
+      break
+    default:
+      numberOfSquaresInDirection = 0
+  }
+  return numberOfSquaresInDirection
 }
 
 function precomputedMoveData() {
@@ -241,6 +307,11 @@ function precomputedMoveData() {
     }
   }
 }
+
+function getFigureByIndex(index: number): Figure {
+  return board.squares[Math.floor(index / 8)][index % 8] ?? null
+}
+
 // function showMoves(figure: Figure,i: number,j: number)
 // {
 //     console.log(figure)
