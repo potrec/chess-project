@@ -7,6 +7,7 @@
           v-for="(square, j) in line"
           :key="j"
           :index="64 - (8 - j) - i * 8"
+          ref="itemRefs"
           draggable="false"
           v-on:dragenter="handleDragEnter($event, square, i, j)"
           v-on:dragend="handleDragEnd($event, square)"
@@ -19,6 +20,7 @@
             draggable="true"
             v-on:dragstart="handleDragStart($event, square)"
           />
+          {{ 64 - (8 - j) - i * 8 }}
         </div>
       </div>
     </div>
@@ -26,12 +28,24 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
-import { isUpperCase } from '../helpers/isUpperCase'
+import { ref, reactive, onMounted, nextTick } from 'vue'
+import { isUpperCase } from '../../helpers/isUpperCase'
 
 var board = reactive({
   squares: Array.from({ length: 8 }, () => Array(8).fill(null))
 })
+const itemRefs = ref([])
+
+// onMounted(() => {
+//   itemRefs.value.forEach((element) => {
+//     console.log(element.getAttribute('index'))
+//     let index = element.getAttribute('index')
+//     let arrayOfTargets: [] =
+//     if()
+//     element.style.backgroundColor = '#FFFF00'
+//   })
+//   let square = itemRefs
+// })
 
 const directionOffsets: number[] = [8, -8, -1, 1, 7, -7, 9, -9]
 const arrayOfSquaresToEdge: numSquaresToEdge[] = []
@@ -56,6 +70,7 @@ type Figure = {
   color: FigureColor
   file: string
   rank: number
+  moves: Move[]
 }
 
 type FenNotationType = {
@@ -104,7 +119,7 @@ const otherFEN: string = 'r1bk3r/p2pBpNp/n4n2/1p1NP2P/6P1/3P4/P1P1K3/q5b1 b - - 
 // const testFEN: string = '3b4/8/8/8/8/3B'
 loadPositionFromFen(otherFEN)
 function loadPositionFromFen(fen: string) {
-  board.squares = Array.from({ length: 8 }, () => Array(8).fill(null))
+  // board.squares = Array.from({ length: 8 }, () => Array(8).fill(null))
   let fenBoard: string = fen.split(' ')[0]
   let file: number = 0
   let rank: number = 8
@@ -116,7 +131,6 @@ function loadPositionFromFen(fen: string) {
       index++
     } else {
       if (Number(symbol)) {
-        console.log(symbol)
         for (let i = file; i < file + Number(symbol); i++) {
           board.squares[index][i] = {
             type: FigureType.ClearBoard,
@@ -211,33 +225,43 @@ function addFigureImage() {
 
 function onClick(figure: Figure, index: number) {
   console.log(figure, index)
+  if (!figure.moves) {
+    return 0
+  }
+  figure.moves.forEach((move) => {
+    setSquareColor(move.targetSquare, '#FFFF00')
+  })
 }
 
 function calculateMoves(): boolean {
   let indexOfTheFigure =
     64 - (8 - (dragStartSquare.file.charCodeAt(0) - 97)) - dragStartSquare.rank * 8
-  console.log(indexOfTheFigure)
+  // console.log(indexOfTheFigure)
   let indexOfTheEndSquare = 64 - (8 - dragEndSquare.j) - dragEndSquare.i * 8
-  console.log(indexOfTheEndSquare)
+  // console.log(indexOfTheEndSquare)
   if (indexOfTheEndSquare - indexOfTheFigure == 8) {
     console.log('move up')
   }
   return true
 }
-generateMoves()
+
 function generateMoves() {
   for (var startSquare = 0; startSquare < 64; startSquare++) {
     var piece = getFigureByIndex(startSquare)
+    console.log(piece, startSquare)
     if (piece == null) {
       continue
     }
     if (piece.type == FigureType.Bishop && piece.color == playerColor) {
-      generateSlidingMoves(startSquare)
+      piece.moves = generateSlidingMoves(startSquare)
+      console.log(piece.moves)
     }
     // console.log(piece)
   }
   // return moves
 }
+
+generateMoves()
 
 function generateSlidingMoves(startSquare: number): Move[] {
   let startDirIndex = getFigureByIndex(startSquare).type == FigureType.Bishop ? 4 : 0
@@ -247,28 +271,29 @@ function generateSlidingMoves(startSquare: number): Move[] {
     let numberOfSquaresInDirection = getNumberOfSquaresInDirection(startSquare, directionIndex)
     for (let n = 0; n < numberOfSquaresInDirection; n++) {
       let targetSquare = startSquare + directionOffsets[directionIndex] * (n + 1)
-      console.log(targetSquare)
-      let figure = getFigureByIndex(1)
-      console.log(playerColor, figure.color)
-      // if (playerColor == figure.color) {
-      //   break
-      // }
+      console.log('target square: ' + targetSquare)
+      let figure = getFigureByIndex(targetSquare)
+      if (playerColor == figure.color) {
+        console.log('met same color figure, changing direction')
+        break
+      }
       moves.push({ startSquare, targetSquare })
-      if (playerColor == opponentColor) {
+      if (opponentColor == figure.color) {
+        console.log('met enemy color, changing direction')
         break
       }
     }
   }
-  console.log('moves:', moves)
-  moves.forEach((move) => {
-    console.log(move)
-    setSquareColor(move.targetSquare, '#fcba03')
-  })
   return moves
 }
 
 function setSquareColor(squareIndex: number, color: string) {
-  //logic that will color square to the color
+  itemRefs.value.forEach((element) => {
+    let index = element.getAttribute('index')
+    if (squareIndex == index) {
+      element.style.backgroundColor = '#FFFF00'
+    }
+  })
 }
 
 function getNumberOfSquaresInDirection(startSquare: number, directionIndex: number): number {
@@ -331,7 +356,7 @@ function precomputedMoveData() {
 }
 
 function getFigureByIndex(index: number): Figure {
-  return board.squares[Math.floor(index / 8)][index % 8] ?? null
+  return board.squares[7 - Math.floor(index / 8)][index % 8] ?? null
 }
 
 // function showMoves(figure: Figure,i: number,j: number)
