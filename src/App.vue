@@ -2,7 +2,7 @@
   <div class="main-view">
     <SiteNavigation />
     <Board />
-    <!-- <RouterView/> -->
+    <RouterView />
   </div>
 </template>
 
