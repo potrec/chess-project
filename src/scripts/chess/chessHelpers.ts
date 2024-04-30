@@ -73,7 +73,7 @@ export function setSquareColor(squareIndex: number, color: string, itemRefs: any
   itemRefs.value.forEach((element) => {
     const index = element.getAttribute('index')
     if (squareIndex == index) {
-      element.style.backgroundColor ? color : '#FFFF00'
+      element.style.backgroundColor = color
     }
   })
 }
@@ -112,7 +112,14 @@ export function getFigureTypeByString(fenSymbol: string): FigureType | undefined
 }
 
 export function deleteFigureImage(board: any, dragStartSquare: Figure) {
-  board.squares[dragStartSquare.rank][dragStartSquare.file.charCodeAt(0) - 97] = null
+  const clearSquare: Figure = {
+    type: FigureType.ClearBoard,
+    color: FigureColorType.ClearBoard,
+    file: dragStartSquare.file,
+    rank: dragStartSquare.rank,
+    moves: []
+  };
+  board.squares[8-dragStartSquare.rank][dragStartSquare.file.charCodeAt(0) - 97] = clearSquare
 }
 
 export function loadPositionFromFen(fen: string) {

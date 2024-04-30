@@ -53,7 +53,7 @@ let currentPlayer = FigureColorType.White
 let opponentColor = FigureColorType.Black
 let selectedSquare = null
 
-var board = loadPositionFromFen(startFEN)
+var board = loadPositionFromFen(otherFEN)
 
 var dragStartSquare: Figure
 var dragEndSquare: TempFigure
@@ -64,15 +64,15 @@ function handleDragStart(event: MouseEvent, figure: Figure) {
 
 function handleDragEnd(event: MouseEvent, figure: Figure) {
   board.squares[dragEndSquare.i][dragEndSquare.j] = figure
-  calculateMoves()
   if (
     dragStartSquare.rank != dragEndSquare.i ||
     dragStartSquare.file.charCodeAt(0) - 97 != dragEndSquare.j
   ) {
     deleteFigureImage(board, dragStartSquare)
-    figure.rank = dragEndSquare.i
+    figure.rank = 8 - dragEndSquare.i
     figure.file = String.fromCharCode(97 + dragEndSquare.j)
   }
+  generateMoves()
   //todo: handle the correct moves of the figures
 }
 
@@ -82,29 +82,12 @@ function handleDragEnter(event: MouseEvent, figure: Figure, i: number, j: number
 }
 
 function onClick(figure: Figure, index: number) {
-  console.log(figure, index)
   if (!figure.moves) {
     return 0
   }
-  // todo: clear all squares
-  // board.squares.forEach((square) => {
-  //   setSquareColor(square., '#FFFFFF')
-  // })
   figure.moves.forEach((move) => {
     setSquareColor(move.targetSquare, '#FFFF00', itemRefs)
   })
-}
-
-function calculateMoves(): boolean {
-  let indexOfTheFigure =
-    64 - (8 - (dragStartSquare.file.charCodeAt(0) - 97)) - dragStartSquare.rank * 8
-  // console.log(indexOfTheFigure)
-  let indexOfTheEndSquare = 64 - (8 - dragEndSquare.j) - dragEndSquare.i * 8
-  // console.log(indexOfTheEndSquare)
-  if (indexOfTheEndSquare - indexOfTheFigure == 8) {
-    console.log('move up')
-  }
-  return true
 }
 
 function generateMoves() {
@@ -115,13 +98,7 @@ function generateMoves() {
       continue
     }
     if (piece.type == FigureType.Bishop) {
-      piece.moves = generateSlidingMoves(
-        startSquare,
-        playerColor,
-        opponentColor,
-        board,
-        arrayOfSquaresToEdge
-      )
+      piece.moves = generateSlidingMoves(startSquare, board, arrayOfSquaresToEdge)
       console.log(piece.moves)
     }
     // console.log(piece)

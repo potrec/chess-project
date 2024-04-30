@@ -3,10 +3,10 @@ import type { Move, NumSquaresToEdge } from "@/types/chessTypes"
 import { getFigureByIndex, getNumberOfSquaresInDirection} from "./chessHelpers"
 import { directionOffsets } from "@/constants/chess/piece"
 
-export function generateSlidingMoves(startSquare: number, playerColor: FigureColorType,opponentColor: FigureColorType, board: any, arrayOfSquaresToEdge: NumSquaresToEdge[]): Move[] {
+export function generateSlidingMoves(startSquare: number, board: any, arrayOfSquaresToEdge: NumSquaresToEdge[]): Move[] {
   const selectedFigure = getFigureByIndex(startSquare,board)
   const startDirIndex = selectedFigure.type == FigureType.Bishop ? 4 : 0
-  const endDirIndex = selectedFigure.type == FigureType.Rook ? 4 : 8
+  const endDirIndex = selectedFigure.type == FigureType.Queen ? 4 : 8
   const moves: Move[] = []
   for (let directionIndex = startDirIndex; directionIndex < endDirIndex; directionIndex++) {
     //todo: check black rook when in start situation
@@ -20,11 +20,16 @@ export function generateSlidingMoves(startSquare: number, playerColor: FigureCol
         break
       }
       moves.push({ startSquare, targetSquare })
-      if (selectedFigure.color != figure.color) {
+      if (selectedFigure.color != figure.color && figure.color != FigureColorType.ClearBoard) {
         console.log('met enemy color, changing direction')
         break
       }
     }
   }
   return moves
+}
+
+export function generateStraightMoves(startSquare: number, board: any, arrayOfSquaresToEdge: NumSquaresToEdge[]): Move[]
+{
+
 }
