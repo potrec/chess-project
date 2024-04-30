@@ -4,8 +4,9 @@ import { getFigureByIndex, getNumberOfSquaresInDirection} from "./chessHelpers"
 import { directionOffsets } from "@/constants/chess/piece"
 
 export function generateSlidingMoves(startSquare: number, playerColor: FigureColorType,opponentColor: FigureColorType, board: any, arrayOfSquaresToEdge: NumSquaresToEdge[]): Move[] {
-  const startDirIndex = getFigureByIndex(startSquare,board).type == FigureType.Bishop ? 4 : 0
-  const endDirIndex = getFigureByIndex(startSquare,board).type == FigureType.Rook ? 4 : 8
+  const selectedFigure = getFigureByIndex(startSquare,board)
+  const startDirIndex = selectedFigure.type == FigureType.Bishop ? 4 : 0
+  const endDirIndex = selectedFigure.type == FigureType.Rook ? 4 : 8
   const moves: Move[] = []
   for (let directionIndex = startDirIndex; directionIndex < endDirIndex; directionIndex++) {
     //todo: check black rook when in start situation
@@ -14,12 +15,12 @@ export function generateSlidingMoves(startSquare: number, playerColor: FigureCol
       const targetSquare = startSquare + directionOffsets[directionIndex] * (n + 1)
       console.log('target square: ' + targetSquare)
       const figure = getFigureByIndex(targetSquare,board)
-      if (playerColor == figure.color) {
+      if (selectedFigure.color == figure.color) {
         console.log('met same color figure, changing direction')
         break
       }
       moves.push({ startSquare, targetSquare })
-      if (opponentColor == figure.color) {
+      if (selectedFigure.color != figure.color) {
         console.log('met enemy color, changing direction')
         break
       }
