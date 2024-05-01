@@ -41,19 +41,20 @@ import {
   setSquareColor,
   getFigures
 } from '../../scripts/chess/chessHelpers'
-import { generateSlidingMoves } from '../../scripts/chess/chessMoves'
+import { generateSlidingMoves, generateHorseMoves } from '../../scripts/chess/chessMoves'
 const itemRefs = ref<any>([])
 const arrayOfSquaresToEdge: NumSquaresToEdge[] = setMoveData()
 
 const startFEN: string = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
 const otherFEN: string = 'r1bk3r/p2pBpNp/n4n2/1p1NP2P/6P1/3P4/P1P1K3/q5b1 b - - 1 23'
+const knightFEN: string = '8/8/8/4n3/8/8/8/8'
 
 let playerColor = FigureColorType.White
 let currentPlayer = FigureColorType.White
 let opponentColor = FigureColorType.Black
 let selectedSquare = null
 
-var board = loadPositionFromFen(otherFEN)
+var board = loadPositionFromFen(knightFEN)
 
 var dragStartSquare: Figure
 var dragEndSquare: TempFigure
@@ -93,15 +94,20 @@ function onClick(figure: Figure, index: number) {
 function generateMoves() {
   for (var startSquare = 0; startSquare < 64; startSquare++) {
     var piece = getFigureByIndex(startSquare, board)
-    console.log(piece, startSquare)
     if (piece == null) {
       continue
     }
-    if (piece.type == FigureType.Bishop) {
+    if (
+      piece.type == FigureType.Bishop ||
+      piece.type == FigureType.Queen ||
+      piece.type == FigureType.Rook
+    ) {
       piece.moves = generateSlidingMoves(startSquare, board, arrayOfSquaresToEdge)
-      console.log(piece.moves)
     }
-    // console.log(piece)
+    if (piece.type == FigureType.Knight) {
+      piece.moves = generateHorseMoves(startSquare, board, arrayOfSquaresToEdge)
+    }
+    //console.log(generateHorseMoves(startSquare, board, arrayOfSquaresToEdge))
   }
   // return moves
 }

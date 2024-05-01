@@ -11,4 +11,15 @@ export const pieceTypeFromSymbol: FenNotationType[] = [
   { figure: FigureType.Queen, string: 'q' }
 ]
 
+/** 
+ * directionIndex: 
+ * 0 - górny
+ * 1 - dolny
+ * 2 - lewy
+ * 3 - prawy
+ * 4 - lewy górny
+ * 6 - prawy górny
+ * 5 - prawy dolny
+ * 7 - lewy dolny
+*/ 
 export const directionOffsets: number[] = [8, -8, -1, 1, 7, -7, 9, -9]
