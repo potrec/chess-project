@@ -48,11 +48,11 @@ export function generateKnightMoves(startSquare: number, board: any, arrayOfSqua
       const targetSquare = getSquareIndexByCords(x-canMoveOnX[i], y-canMoveOnY[i])
       const figure = getFigureByIndex(targetSquare,board)
       if (selectedFigure.color == figure.color) {
-        break
+        continue
       }
       moves.push({ startSquare, targetSquare })
       if (selectedFigure.color != figure.color && figure.color != FigureColorType.ClearBoard) {
-        break
+        continue
       }
     }
   }

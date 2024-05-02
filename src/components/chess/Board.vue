@@ -54,7 +54,7 @@ let currentPlayer = FigureColorType.White
 let opponentColor = FigureColorType.Black
 let selectedSquare = null
 
-var board = loadPositionFromFen(knightFEN)
+var board = loadPositionFromFen(otherFEN)
 
 var dragStartSquare: Figure
 var dragEndSquare: TempFigure
