@@ -39,7 +39,8 @@ import {
   loadPositionFromFen,
   setSquareColor,
   getFigures,
-  getSquareIndexByCords
+  getSquareIndexByCords,
+  removeSquareColor
 } from '../../scripts/chess/chessHelpers'
 import { generateSlidingMoves, generateKnightMoves } from '../../scripts/chess/chessMoves'
 const itemRefs = ref<any>([])
@@ -88,8 +89,13 @@ function onClick(figure: Figure, index: number) {
   if (!figure.moves) {
     return 0
   }
+  for (let i = 0; i < 64; i++) {
+    removeSquareColor(i, ['red', 'yellow'], itemRefs)
+  }
   figure.moves.forEach((move) => {
-    setSquareColor(move.targetSquare, '#FFFF00', itemRefs)
+    let square = getFigureByIndex(move.targetSquare, board)
+    let color = square.color != FigureColorType.ClearBoard ? 'red' : 'yellow'
+    setSquareColor(move.targetSquare, color, itemRefs)
   })
 }
 

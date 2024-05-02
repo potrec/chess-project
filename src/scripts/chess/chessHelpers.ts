@@ -80,13 +80,21 @@ export function setMoveData(): NumSquaresToEdge[] {
 }
 
 
-export function setSquareColor(squareIndex: number, color: string, itemRefs: any) {
-  itemRefs.value.forEach((element) => {
-    const index = element.getAttribute('index')
-    if (squareIndex == index) {
-      element.style.backgroundColor = color
-    }
-  })
+export function setSquareColor(squareIndex: number, colorClass: string, itemRefs: any) {
+  const targetElement = itemRefs.value.find(element => element.getAttribute('index') === squareIndex.toString());
+  if (targetElement) {
+    targetElement.classList.add(colorClass);
+  }
+}
+
+export function removeSquareColor(squareIndex: number, colorClasses: string[], itemRefs: any) {
+  const targetElement = itemRefs.value.find(element => element.getAttribute('index') === squareIndex.toString());
+  if (targetElement) {
+    console.log("remove");
+    colorClasses.forEach(className => {
+      targetElement.classList.remove(className);
+    });
+  }
 }
 
 export function getFigures(figure: Figure): string {
