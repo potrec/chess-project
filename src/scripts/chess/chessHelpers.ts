@@ -40,6 +40,17 @@ export function getFigureByIndex(index: number, board: any): Figure {
   return board.squares[7 - Math.floor(index / 8)][index % 8] ?? null
 }
 
+export function getSquareIndexByCords(x: number ,y: number): number {
+  return 64 - (8 - y) - x * 8
+}
+
+export function getIndexesByFigureIndex(squareIndex: number){
+  return {
+    x: 7 - Math.floor(squareIndex / 8),
+    y: squareIndex % 8
+  }
+}
+
 export function setMoveData(): NumSquaresToEdge[] {
   const arrayOfSquaresToEdge: NumSquaresToEdge[] = [];
   for (let file = 0; file < 8; file++) {

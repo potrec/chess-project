@@ -41,7 +41,7 @@ import {
   setSquareColor,
   getFigures
 } from '../../scripts/chess/chessHelpers'
-import { generateSlidingMoves, generateHorseMoves } from '../../scripts/chess/chessMoves'
+import { generateSlidingMoves, generateKnightMoves } from '../../scripts/chess/chessMoves'
 const itemRefs = ref<any>([])
 const arrayOfSquaresToEdge: NumSquaresToEdge[] = setMoveData()
 
@@ -58,6 +58,8 @@ var board = loadPositionFromFen(knightFEN)
 
 var dragStartSquare: Figure
 var dragEndSquare: TempFigure
+
+generateMoves()
 
 function handleDragStart(event: MouseEvent, figure: Figure) {
   dragStartSquare = figure
@@ -105,14 +107,10 @@ function generateMoves() {
       piece.moves = generateSlidingMoves(startSquare, board, arrayOfSquaresToEdge)
     }
     if (piece.type == FigureType.Knight) {
-      piece.moves = generateHorseMoves(startSquare, board, arrayOfSquaresToEdge)
+      piece.moves = generateKnightMoves(startSquare, board, arrayOfSquaresToEdge)
     }
-    //console.log(generateHorseMoves(startSquare, board, arrayOfSquaresToEdge))
   }
-  // return moves
 }
-
-generateMoves()
 
 function isSelected(squareIndex) {
   // if(squareIndex == )
