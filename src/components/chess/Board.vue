@@ -6,13 +6,13 @@
           class="board-square"
           v-for="(square, j) in line"
           :key="j"
-          :index="64 - (8 - j) - i * 8"
-          :style="{ backgroundColor: isSelected(64 - (8 - j) - i * 8) ? '#FFFF00' : '' }"
+          :index="getSquareIndexByCords(i, j)"
+          :style="{ backgroundColor: isSelected(getSquareIndexByCords(i, j)) ? '#FFFF00' : '' }"
           ref="itemRefs"
           draggable="false"
           v-on:dragenter="handleDragEnter($event, square, i, j)"
           v-on:dragend="handleDragEnd($event, square)"
-          @click="onClick(square, 64 - (8 - j) - i * 8)"
+          @click="onClick(square, getSquareIndexByCords(i, j))"
         >
           <img
             class="figure"
@@ -21,7 +21,7 @@
             draggable="true"
             v-on:dragstart="handleDragStart($event, square)"
           />
-          {{ 64 - (8 - j) - i * 8 }}
+          {{ getSquareIndexByCords(i, j) }}
         </div>
       </div>
     </div>
@@ -37,9 +37,9 @@ import {
   setMoveData,
   deleteFigureImage,
   loadPositionFromFen,
-  setSquareColorimport,
   setSquareColor,
-  getFigures
+  getFigures,
+  getSquareIndexByCords
 } from '../../scripts/chess/chessHelpers'
 import { generateSlidingMoves, generateKnightMoves } from '../../scripts/chess/chessMoves'
 const itemRefs = ref<any>([])

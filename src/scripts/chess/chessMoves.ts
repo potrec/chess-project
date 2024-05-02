@@ -3,11 +3,13 @@ import type { Move, NumSquaresToEdge } from "@/types/chessTypes"
 import { getFigureByIndex, getNumberOfSquaresInDirection, getSquareIndexByCords, getIndexesByFigureIndex} from "./chessHelpers"
 import { directionOffsets } from "@/constants/chess/piece"
 
-export function generateSlidingMoves(startSquare: number, board: any, arrayOfSquaresToEdge: NumSquaresToEdge[]): Move[] {
+export function generateSlidingMoves(startSquare: number, board: any, arrayOfSquaresToEdge: NumSquaresToEdge[]): Move[] 
+{
   const selectedFigure = getFigureByIndex(startSquare,board)
   const startDirIndex = selectedFigure.type == FigureType.Bishop ? 4 : 0
   const endDirIndex = selectedFigure.type == FigureType.Rook ? 4 : 8
   const moves: Move[] = []
+
   for (let directionIndex = startDirIndex; directionIndex < endDirIndex; directionIndex++) {
     //todo: check black rook when in start situation
     const numberOfSquaresInDirection = getNumberOfSquaresInDirection(startSquare, directionIndex, arrayOfSquaresToEdge)
@@ -33,6 +35,7 @@ export function generateStraightMoves(startSquare: number, board: any, arrayOfSq
 
 export function generateKnightMoves(startSquare: number, board: any, arrayOfSquaresToEdge: NumSquaresToEdge[]): Move[]
 {
+  const selectedFigure = getFigureByIndex(startSquare,board)
   const moves: Move[] = []
   const {x: x, y: y} = getIndexesByFigureIndex(startSquare)
   const canMoveOnX = [ 2, 1, -1, -2, -2, -1, 1, 2 ];
@@ -42,7 +45,15 @@ export function generateKnightMoves(startSquare: number, board: any, arrayOfSqua
   {
     if(!(x-canMoveOnX[i] < 0 || y-canMoveOnY[i] < 0 || !board.squares[x-canMoveOnX[i]] || !board.squares[x-canMoveOnX[i]][y-canMoveOnY[i]]))
     {
-      moves.push({startSquare: startSquare,targetSquare: getSquareIndexByCords(x-canMoveOnX[i], y-canMoveOnY[i])})
+      const targetSquare = getSquareIndexByCords(x-canMoveOnX[i], y-canMoveOnY[i])
+      const figure = getFigureByIndex(targetSquare,board)
+      if (selectedFigure.color == figure.color) {
+        break
+      }
+      moves.push({ startSquare, targetSquare })
+      if (selectedFigure.color != figure.color && figure.color != FigureColorType.ClearBoard) {
+        break
+      }
     }
   }
   return moves
