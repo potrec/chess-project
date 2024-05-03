@@ -19,7 +19,7 @@
             v-if="square.type != FigureType.ClearBoard"
             :src="getFigures(square)"
             draggable="true"
-            v-on:dragstart="handleDragStart($event, square)"
+            v-on:dragstart="handleDragStart($event, getSquareIndexByCords(i, j))"
           />
           {{ getSquareIndexByCords(i, j) }}
         </div>
@@ -40,7 +40,8 @@ import {
   setSquareColor,
   getFigures,
   getSquareIndexByCords,
-  removeSquareColor
+  removeSquareColor,
+  getIndexesByFigureIndex
 } from '../../scripts/chess/chessHelpers'
 import { generateSlidingMoves, generateKnightMoves } from '../../scripts/chess/chessMoves'
 const itemRefs = ref<any>([])
@@ -53,28 +54,28 @@ const knightFEN: string = '8/8/8/4n3/8/8/8/8'
 let playerColor = FigureColorType.White
 let currentPlayer = FigureColorType.White
 let opponentColor = FigureColorType.Black
-let selectedSquare = null
+let selectedSquare = 64
 
 var board = loadPositionFromFen(otherFEN)
 
-var dragStartSquare: Figure
-var dragEndSquare: TempFigure
+var dragStartSquare: number
+var dragEndSquare: number
 
 generateMoves()
 
-function handleDragStart(event: MouseEvent, figure: Figure) {
+function handleDragStart(event: MouseEvent, figure: number) {
   dragStartSquare = figure
+  dragEndSquare = figure
 }
 
 function handleDragEnd(event: MouseEvent, figure: Figure) {
-  board.squares[dragEndSquare.i][dragEndSquare.j] = figure
-  if (
-    dragStartSquare.rank != dragEndSquare.i ||
-    dragStartSquare.file.charCodeAt(0) - 97 != dragEndSquare.j
-  ) {
-    deleteFigureImage(board, dragStartSquare)
-    figure.rank = 8 - dragEndSquare.i
-    figure.file = String.fromCharCode(97 + dragEndSquare.j)
+  if (dragStartSquare != dragEndSquare) {
+    let startFigure = getFigureByIndex(dragStartSquare, board)
+    deleteFigureImage(board, startFigure)
+    const { x: x, y: y } = getIndexesByFigureIndex(dragEndSquare)
+    figure.rank = 8 - x
+    figure.file = String.fromCharCode(97 + y)
+    board.squares[x][y] = figure
   }
   generateMoves()
   //todo: handle the correct moves of the figures
@@ -82,7 +83,7 @@ function handleDragEnd(event: MouseEvent, figure: Figure) {
 
 function handleDragEnter(event: MouseEvent, figure: Figure, i: number, j: number) {
   event.preventDefault()
-  dragEndSquare = { i: i, j: j }
+  dragEndSquare = getSquareIndexByCords(i, j)
 }
 
 function onClick(figure: Figure, index: number) {
@@ -90,13 +91,19 @@ function onClick(figure: Figure, index: number) {
     return 0
   }
   for (let i = 0; i < 64; i++) {
-    removeSquareColor(i, ['red', 'yellow'], itemRefs)
+    removeSquareColor(i, ['red', 'yellow', 'purple'], itemRefs)
   }
+  if (selectedSquare == index) {
+    selectedSquare = 65
+    return 0
+  }
+  selectedSquare = index
   figure.moves.forEach((move) => {
     let square = getFigureByIndex(move.targetSquare, board)
     let color = square.color != FigureColorType.ClearBoard ? 'red' : 'yellow'
     setSquareColor(move.targetSquare, color, itemRefs)
   })
+  setSquareColor(index, 'purple', itemRefs)
 }
 
 function generateMoves() {

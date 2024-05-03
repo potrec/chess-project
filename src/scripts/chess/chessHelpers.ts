@@ -90,7 +90,6 @@ export function setSquareColor(squareIndex: number, colorClass: string, itemRefs
 export function removeSquareColor(squareIndex: number, colorClasses: string[], itemRefs: any) {
   const targetElement = itemRefs.value.find(element => element.getAttribute('index') === squareIndex.toString());
   if (targetElement) {
-    console.log("remove");
     colorClasses.forEach(className => {
       targetElement.classList.remove(className);
     });
