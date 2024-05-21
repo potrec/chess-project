@@ -73,6 +73,7 @@ function handleDragStart(event: MouseEvent, figure: number) {
 }
 
 function handleDragEnd(event: MouseEvent, figure: Figure) {
+  if (!figure.moves) return 0
   if (dragStartSquare == dragEndSquare) return 0
   let targetMoves: number[] = figure.moves.map((move) => move.targetSquare)
   if (!targetMoves.includes(dragEndSquare)) return 0 // todo":play sound or alert the player that he can't move there
@@ -83,7 +84,6 @@ function handleDragEnd(event: MouseEvent, figure: Figure) {
   figure.file = String.fromCharCode(97 + y)
   board.squares[x][y] = figure
   generateMoves()
-  //todo: handle the correct moves of the figures
 }
 
 function handleDragEnter(event: MouseEvent, figure: Figure, i: number, j: number) {
