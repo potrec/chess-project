@@ -31,7 +31,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { FigureColorType, FigureType } from '../../enums/figure'
-import type { Figure, TempFigure, NumSquaresToEdge } from '../../types/chessTypes'
+import type { Figure, TempFigure, NumSquaresToEdge, Move } from '../../types/chessTypes'
 import {
   getFigureByIndex,
   setMoveData,
@@ -73,14 +73,15 @@ function handleDragStart(event: MouseEvent, figure: number) {
 }
 
 function handleDragEnd(event: MouseEvent, figure: Figure) {
-  if (dragStartSquare != dragEndSquare) {
-    let startFigure = getFigureByIndex(dragStartSquare, board)
-    deleteFigureImage(board, startFigure)
-    const { x: x, y: y } = getIndexesByFigureIndex(dragEndSquare)
-    figure.rank = 8 - x
-    figure.file = String.fromCharCode(97 + y)
-    board.squares[x][y] = figure
-  }
+  if (dragStartSquare == dragEndSquare) return 0
+  let targetMoves: number[] = figure.moves.map((move) => move.targetSquare)
+  if (!targetMoves.includes(dragEndSquare)) return 0 // todo":play sound or alert the player that he can't move there
+  let startFigure = getFigureByIndex(dragStartSquare, board)
+  deleteFigureImage(board, startFigure)
+  const { x: x, y: y } = getIndexesByFigureIndex(dragEndSquare)
+  figure.rank = 8 - x
+  figure.file = String.fromCharCode(97 + y)
+  board.squares[x][y] = figure
   generateMoves()
   //todo: handle the correct moves of the figures
 }
@@ -110,7 +111,7 @@ function onClick(figure: Figure, index: number) {
   setSquareColor(index, 'purple', itemRefs)
 }
 
-function generateMoves() {
+function generateMoves(): void {
   for (var startSquare = 0; startSquare < 64; startSquare++) {
     var piece = getFigureByIndex(startSquare, board)
     if (piece == null) {
@@ -128,7 +129,7 @@ function generateMoves() {
     }
     if (piece.type == FigureType.Pawn) {
       piece.moves = generateStraightMoves(startSquare, board, arrayOfSquaresToEdge)
-      console.log(piece.moves)
+      // console.log(piece.moves)
     }
   }
 }
