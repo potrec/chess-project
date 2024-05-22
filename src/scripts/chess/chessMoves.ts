@@ -85,3 +85,28 @@ export function generateKnightMoves(startSquare: number, board: any, arrayOfSqua
   }
   return moves
 }
+
+export function generateKingMoves(startSquare: number, board: any): Move[]
+{
+  const selectedFigure = getFigureByIndex(startSquare,board)
+  const moves: Move[] = []
+  const {x: x, y: y} = getIndexesByFigureIndex(startSquare)
+  const canMoveOnX = [-1, 1, -1, -1, 0, 0, 1, 1];
+  const canMoveOnY = [0, 0, 1, -1, 1, -1, 1, -1];
+  for (let i = 0; i < 8; i++)
+  {
+    if(!(x-canMoveOnX[i] < 0 || y-canMoveOnY[i] < 0 || !board.squares[x-canMoveOnX[i]] || !board.squares[x-canMoveOnX[i]][y-canMoveOnY[i]]))
+    {
+      const targetSquare = getSquareIndexByCords(x-canMoveOnX[i], y-canMoveOnY[i])
+      const figure = getFigureByIndex(targetSquare,board)
+      if (selectedFigure.color == figure.color) {
+        continue
+      }
+      moves.push({ startSquare, targetSquare })
+      if (selectedFigure.color != figure.color && figure.color != FigureColorType.ClearBoard) {
+        continue
+      }
+    }
+  }
+  return moves
+}

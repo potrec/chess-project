@@ -46,7 +46,8 @@ import {
 import {
   generateSlidingMoves,
   generateKnightMoves,
-  generateStraightMoves
+  generateStraightMoves,
+  generateKingMoves
 } from '../../scripts/chess/chessMoves'
 const itemRefs = ref<any>([])
 const arrayOfSquaresToEdge: NumSquaresToEdge[] = setMoveData()
@@ -60,7 +61,7 @@ let currentPlayer = FigureColorType.White
 let opponentColor = FigureColorType.Black
 let selectedSquare = 64
 
-var board = loadPositionFromFen(startFEN)
+var board = loadPositionFromFen(otherFEN)
 
 var dragStartSquare: number
 var dragEndSquare: number
@@ -130,6 +131,9 @@ function generateMoves(): void {
     if (piece.type == FigureType.Pawn) {
       piece.moves = generateStraightMoves(startSquare, board, arrayOfSquaresToEdge)
       // console.log(piece.moves)
+    }
+    if (piece.type == FigureType.King) {
+      piece.moves = generateKingMoves(startSquare, board)
     }
   }
 }
