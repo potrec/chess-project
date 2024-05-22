@@ -7,7 +7,6 @@
           v-for="(square, j) in line"
           :key="j"
           :index="getSquareIndexByCords(i, j)"
-          :style="{ backgroundColor: isSelected(getSquareIndexByCords(i, j)) ? '#FFFF00' : '' }"
           ref="itemRefs"
           draggable="false"
           v-on:dragenter="handleDragEnter($event, square, i, j)"
@@ -30,8 +29,8 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { FigureColorType, FigureType } from '../../enums/figure'
-import type { Figure, TempFigure, NumSquaresToEdge, Move } from '../../types/chessTypes'
+import { FigureColorType, FigureType } from '@/enums/figure'
+import type { Figure, TempFigure, NumSquaresToEdge, Move } from '@/types/chessTypes'
 import {
   getFigureByIndex,
   setMoveData,
@@ -42,13 +41,20 @@ import {
   getSquareIndexByCords,
   removeSquareColor,
   getIndexesByFigureIndex
-} from '../../scripts/chess/chessHelpers'
+} from '@/scripts/chess/chessHelpers'
 import {
   generateSlidingMoves,
   generateKnightMoves,
   generateStraightMoves,
   generateKingMoves
-} from '../../scripts/chess/chessMoves'
+} from '@/scripts/chess/chessMoves'
+
+const props = defineProps({
+  playerColor: {
+    type: FigureColorType,
+    default: FigureColorType.White
+  }
+})
 const itemRefs = ref<any>([])
 const arrayOfSquaresToEdge: NumSquaresToEdge[] = setMoveData()
 
@@ -56,9 +62,7 @@ const startFEN: string = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0
 const otherFEN: string = 'r1bk3r/p2pBpNp/n4n2/1p1NP2P/6P1/3P4/P1P1K3/q5b1 b - - 1 23'
 const knightFEN: string = '8/8/8/4n3/8/8/8/8'
 
-let playerColor = FigureColorType.White
 let currentPlayer = FigureColorType.White
-let opponentColor = FigureColorType.Black
 let selectedSquare = 64
 
 var board = loadPositionFromFen(otherFEN)
@@ -75,6 +79,8 @@ function handleDragStart(event: MouseEvent, figure: number) {
 
 function handleDragEnd(event: MouseEvent, figure: Figure) {
   if (!figure.moves) return 0
+  if (props.playerColor != currentPlayer) return 0
+  if (props.playerColor != figure.color) return 0
   if (dragStartSquare == dragEndSquare) return 0
   let targetMoves: number[] = figure.moves.map((move) => move.targetSquare)
   if (!targetMoves.includes(dragEndSquare)) return 0 // todo":play sound or alert the player that he can't move there
@@ -84,6 +90,11 @@ function handleDragEnd(event: MouseEvent, figure: Figure) {
   figure.rank = 8 - x
   figure.file = String.fromCharCode(97 + y)
   board.squares[x][y] = figure
+  if (currentPlayer === FigureColorType.Black) {
+    currentPlayer = FigureColorType.White
+  } else {
+    currentPlayer = FigureColorType.Black
+  }
   generateMoves()
 }
 
@@ -136,12 +147,5 @@ function generateMoves(): void {
       piece.moves = generateKingMoves(startSquare, board)
     }
   }
-}
-
-function isSelected(squareIndex) {
-  // if(squareIndex == )
-  // Your logic to determine if the square is a move square
-  // This is a placeholder. You need to implement the actual logic.
-  return false // or false based on your condition
 }
 </script>
