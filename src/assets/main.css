@@ -109,15 +109,42 @@ img {
     border: 1px solid #888;
     width: 80%;
 }
-.primary-button {
-    background-color: var(--primary);
-    margin: 10% 10% 10% 10%;
+button
+{
     border-radius: 5px;
     min-height: 32px;
-    padding: 10%;
-
+    display: inline-flex;
+    align-items: center;
+    font-weight: bold;
 }
-.primary-button:hover
+.primary {
+    background-color: var(--black);
+    color: var(--white);
+}
+.primary:hover
 {
-    background-color: var(--secondary)
+    background-color: var(--gray)
+}
+.secondary {
+    background-color: var(--white);
+    color: var(--black);
+}
+.secondary:hover {
+    background-color: var(--secondary);
+    color: var(--black);
+}
+.danger {
+    background-color: var(--red);
+    color: var(--white);
+}
+.button-image {
+    min-height: 30px;
+    padding-right: 5%;
+    padding-left: 5%;
+}
+.disabled{
+    cursor: not-allowed;
+    pointer-events: none;
+    background: var(--gray);
+    color: var(--white);
 }

@@ -1,5 +1,5 @@
 <template>
-  <div v-if="props.toggle == true" class="modal">
+  <div v-if="modalActive == true" class="modal">
     <div class="modal-content">
       <h1>Choose side you want to play</h1>
       <div class="modal-buttons">
@@ -12,8 +12,10 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-const props = defineProps(['toggle'])
-// const modal = ref(false)
-
-// const toggleModal =
+defineProps({
+  modalActive: {
+    type: Boolean,
+    default: false
+  }
+})
 </script>
