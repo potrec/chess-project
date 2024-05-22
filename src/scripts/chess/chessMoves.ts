@@ -108,5 +108,7 @@ export function generateKingMoves(startSquare: number, board: any): Move[]
       }
     }
   }
+  //roszada
+  
   return moves
 }
