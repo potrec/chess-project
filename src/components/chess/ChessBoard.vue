@@ -2,26 +2,16 @@
   <div class="main-container">
     <div class="board-container">
       <div class="board-line" v-for="(line, i) in board.squares" :key="i">
-        <div
-          class="board-square"
+        <ChessBoardSquare
           v-for="(square, j) in line"
           :key="j"
-          :index="getSquareIndexByCords(i, j)"
-          ref="itemRefs"
-          draggable="false"
-          v-on:dragenter="handleDragEnter($event, square, i, j)"
-          v-on:dragend="handleDragEnd($event, square)"
-          @click="onClick(square, getSquareIndexByCords(i, j))"
-        >
-          <img
-            class="figure"
-            v-if="square.type != FigureType.ClearBoard"
-            :src="getFigures(square)"
-            draggable="true"
-            v-on:dragstart="handleDragStart($event, getSquareIndexByCords(i, j))"
-          />
-          {{ getSquareIndexByCords(i, j) }}
-        </div>
+          :piece="square"
+          :row-index="i"
+          :col-index="j"
+          @drag-start="handleDragStart"
+          @drag-end="handleDragEnd"
+          @click="onClick"
+        />
       </div>
     </div>
   </div>
@@ -48,24 +38,24 @@ import {
   generateStraightMoves,
   generateKingMoves
 } from '@/scripts/chess/chessMoves'
-
+import ChessBoardSquare from '@/components/chess/ChessBoardSquare.vue'
 const props = defineProps({
   playerColor: {
     type: FigureColorType,
     default: FigureColorType.White
+  },
+  fen: {
+    type: String,
+    default: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
   }
 })
 const itemRefs = ref<any>([])
 const arrayOfSquaresToEdge: NumSquaresToEdge[] = setMoveData()
 
-const startFEN: string = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
-const otherFEN: string = 'r1bk3r/p2pBpNp/n4n2/1p1NP2P/6P1/3P4/P1P1K3/q5b1 b - - 1 23'
-const knightFEN: string = '8/8/8/4n3/8/8/8/8'
-
 let currentPlayer = FigureColorType.White
 let selectedSquare = 64
 
-var board = loadPositionFromFen(otherFEN)
+var board = loadPositionFromFen(props.fen)
 
 var dragStartSquare: number
 var dragEndSquare: number
@@ -96,11 +86,6 @@ function handleDragEnd(event: MouseEvent, figure: Figure) {
     currentPlayer = FigureColorType.Black
   }
   generateMoves()
-}
-
-function handleDragEnter(event: MouseEvent, figure: Figure, i: number, j: number) {
-  event.preventDefault()
-  dragEndSquare = getSquareIndexByCords(i, j)
 }
 
 function onClick(figure: Figure, index: number) {
