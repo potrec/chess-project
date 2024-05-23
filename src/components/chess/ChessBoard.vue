@@ -11,6 +11,7 @@
           @drag-start="handleDragStart"
           @drag-end="handleDragEnd"
           @click="onClick"
+          @drag-enter="handleDragEnter"
         />
       </div>
     </div>
@@ -57,26 +58,34 @@ let selectedSquare = 64
 
 var board = loadPositionFromFen(props.fen)
 
-var dragStartSquare: number
-var dragEndSquare: number
+const dragStartSquare = ref(0)
+const dragEndSquare = ref(0)
 
 generateMoves()
 
 function handleDragStart(event: MouseEvent, figure: number) {
-  dragStartSquare = figure
-  dragEndSquare = figure
+  console.log('dragStart')
+  dragStartSquare.value = figure
+  dragEndSquare.value = figure
+}
+
+function handleDragEnter(event: MouseEvent, figure: Figure, i: number, j: number) {
+  console.log('dragEnter')
+  event.preventDefault()
+  dragEndSquare.value = getSquareIndexByCords(i, j)
 }
 
 function handleDragEnd(event: MouseEvent, figure: Figure) {
+  console.log('dragEnd')
   if (!figure.moves) return 0
   if (props.playerColor != currentPlayer) return 0
   if (props.playerColor != figure.color) return 0
-  if (dragStartSquare == dragEndSquare) return 0
+  if (dragStartSquare.value == dragEndSquare.value) return 0
   let targetMoves: number[] = figure.moves.map((move) => move.targetSquare)
-  if (!targetMoves.includes(dragEndSquare)) return 0 // todo":play sound or alert the player that he can't move there
-  let startFigure = getFigureByIndex(dragStartSquare, board)
+  if (!targetMoves.includes(dragEndSquare.value)) return 0 // todo":play sound or alert the player that he can't move there
+  let startFigure = getFigureByIndex(dragStartSquare.value, board)
   deleteFigureImage(board, startFigure)
-  const { x: x, y: y } = getIndexesByFigureIndex(dragEndSquare)
+  const { x: x, y: y } = getIndexesByFigureIndex(dragEndSquare.value)
   figure.rank = 8 - x
   figure.file = String.fromCharCode(97 + y)
   board.squares[x][y] = figure
@@ -89,6 +98,7 @@ function handleDragEnd(event: MouseEvent, figure: Figure) {
 }
 
 function onClick(figure: Figure, index: number) {
+  console.log('onClick')
   if (!figure.moves) {
     return 0
   }

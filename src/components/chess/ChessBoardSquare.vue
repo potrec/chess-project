@@ -5,24 +5,25 @@
     :index="index"
     ref="itemRef"
     draggable="false"
-    v-on:dragenter="handleDragEnter($event, piece, rowIndex, colIndex)"
-    v-on:dragend="handleDragEnd($event, piece)"
-    @click="onClick(piece, index)"
+    @dragenter="$emit('handleDragEnter', $event, piece, rowIndex, colIndex)"
+    @dragend="$emit('handleDragEnd', $event, piece)"
+    @click="$emit('onClick', piece, index)"
   >
     <img
       class="figure"
       v-if="piece && piece.type !== FigureType.ClearBoard"
-      :src="getFigures(piece)"
+      :src="getFigures(props.piece)"
       draggable="true"
-      v-on:dragstart="handleDragStart($event, index)"
+      @dragstart="$emit('handleDragStart', $event, index)"
     />
   </div>
 </template>
 
 <script setup lang="ts">
 import { FigureColorType, FigureType } from '@/enums/figure'
-import { getSquareIndexByCords } from '@/scripts/chess/chessHelpers'
-import { computed, ref } from 'vue'
+import { getSquareIndexByCords, getFigures } from '@/scripts/chess/chessHelpers'
+import type { Figure } from '@/types/chessTypes'
+import { ref } from 'vue'
 
 const props = defineProps({
   rowIndex: { type: Number, default: 0 },
@@ -38,8 +39,7 @@ const props = defineProps({
   }
 })
 
-const index = ref(getSquareIndexByCords(props.rowIndex, props.colIndex))
+const emits = defineEmits(['handleDragEnter', 'handleDragEnd', 'handleDragStart', 'onClick'])
 
-// Import necessary dependencies and props
-// Define methods like handleDragStart, handleDragEnd, etc., similar to those in ChessBoard
+const index = ref(getSquareIndexByCords(props.rowIndex, props.colIndex))
 </script>
