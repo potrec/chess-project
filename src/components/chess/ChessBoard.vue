@@ -8,10 +8,10 @@
           :piece="square"
           :row-index="i"
           :col-index="j"
-          @drag-start="handleDragStart"
-          @drag-end="handleDragEnd"
+          @dragstart="handleDragStart"
+          @dragend="handleDragEnd"
           @click="onClick"
-          @drag-enter="handleDragEnter"
+          @dragenter="handleDragEnter"
         />
       </div>
     </div>
