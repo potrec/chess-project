@@ -70,13 +70,12 @@ function handleDragStart(event: MouseEvent, figure: number) {
 }
 
 function handleDragEnter(event: MouseEvent, figure: Figure, i: number, j: number) {
-  console.log('dragEnter')
   event.preventDefault()
   dragEndSquare.value = getSquareIndexByCords(i, j)
 }
 
 function handleDragEnd(event: MouseEvent, figure: Figure) {
-  console.log('dragEnd')
+  console.log('dragEnd', figure)
   if (!figure.moves) return 0
   if (props.playerColor != currentPlayer) return 0
   if (props.playerColor != figure.color) return 0
