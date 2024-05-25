@@ -20,7 +20,7 @@
 </template>
 
 <script setup lang="ts">
-import { FigureColorType, FigureType } from '@/enums/figure'
+import { FigureType } from '@/enums/figure'
 import { getSquareIndexByCords, getFigures } from '@/scripts/chess/chessHelpers'
 import type { Figure } from '@/types/chessTypes'
 import { ref, type PropType } from 'vue'
@@ -35,10 +35,11 @@ const props = defineProps({
 })
 
 const emits = defineEmits<{
-  (e: 'handleDragEnd', event: MouseEvent, figure: Figure): void
-  (e: 'handleDragEnter', event: MouseEvent, figure: Figure, i: number, j: number): void
-  (e: 'handleDragStart', event: MouseEvent, figure: number): void
-  (e: 'onClick', figure: Figure, index: number): void
+  handleDragEnd: [event: MouseEvent, figure: Figure]
+  handleDragEnter: [event: MouseEvent, figure: Figure, i: number, j: number]
+  handleDragStart: [event: MouseEvent, figure: number]
+  onClick: [figure: Figure, index: number]
+  testEmit: [number: number]
 }>()
 
 const index = ref(getSquareIndexByCords(props.rowIndex, props.colIndex))

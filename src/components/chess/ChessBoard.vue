@@ -8,10 +8,10 @@
           :piece="square"
           :row-index="i"
           :col-index="j"
-          @dragstart="handleDragStart"
-          @dragend="handleDragEnd"
-          @click="onClick"
-          @dragenter="handleDragEnter"
+          @handleDragStart="handleDragStart"
+          @handleDragEnd="handleDragEnd"
+          @onClick="onClick"
+          @handleDragEnter="handleDragEnter"
         />
       </div>
     </div>
@@ -64,7 +64,7 @@ const dragEndSquare = ref(0)
 generateMoves()
 
 function handleDragStart(event: MouseEvent, figure: number) {
-  console.log('dragStart')
+  console.log('dragStart', figure)
   dragStartSquare.value = figure
   dragEndSquare.value = figure
 }
@@ -97,7 +97,7 @@ function handleDragEnd(event: MouseEvent, figure: Figure) {
 }
 
 function onClick(figure: Figure, index: number) {
-  console.log('onClick')
+  console.log('onClick', figure, index)
   if (!figure.moves) {
     return 0
   }
@@ -141,5 +141,9 @@ function generateMoves(): void {
       piece.moves = generateKingMoves(startSquare, board)
     }
   }
+}
+
+function testEmit(number) {
+  console.log(number)
 }
 </script>
