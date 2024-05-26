@@ -142,8 +142,4 @@ function generateMoves(): void {
     }
   }
 }
-
-function testEmit(number) {
-  console.log(number)
-}
 </script>
