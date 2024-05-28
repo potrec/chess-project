@@ -8,6 +8,7 @@
           :piece="square"
           :row-index="i"
           :col-index="j"
+          :style="arrayOfStyles[getSquareIndexByCords(i, j)]"
           @handleDragStart="handleDragStart"
           @handleDragEnd="handleDragEnd"
           @onClick="onClick"
@@ -21,14 +22,13 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { FigureColorType, FigureType } from '@/enums/figure'
-import type { Figure, TempFigure, NumSquaresToEdge, Move } from '@/types/chessTypes'
+import type { Figure, NumSquaresToEdge } from '@/types/chessTypes'
 import {
   getFigureByIndex,
   setMoveData,
   deleteFigureImage,
   loadPositionFromFen,
   setSquareColor,
-  getFigures,
   getSquareIndexByCords,
   removeSquareColor,
   getIndexesByFigureIndex
@@ -50,8 +50,12 @@ const props = defineProps({
     default: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
   }
 })
-const itemRefs = ref<any>([])
+
 const arrayOfSquaresToEdge: NumSquaresToEdge[] = setMoveData()
+const arrayOfStyles = ref([])
+for (var i = 0; i < 64; i++) {
+  arrayOfStyles.value.push('')
+}
 
 let currentPlayer = FigureColorType.White
 let selectedSquare = 64
@@ -97,12 +101,11 @@ function handleDragEnd(event: MouseEvent, figure: Figure) {
 }
 
 function onClick(figure: Figure, index: number) {
-  console.log('onClick', figure, index)
   if (!figure.moves) {
     return 0
   }
   for (let i = 0; i < 64; i++) {
-    removeSquareColor(i, ['red', 'yellow', 'purple'], itemRefs)
+    removeSquareColor(i, arrayOfStyles)
   }
   if (selectedSquare == index) {
     selectedSquare = 65
@@ -112,9 +115,9 @@ function onClick(figure: Figure, index: number) {
   figure.moves.forEach((move) => {
     let square = getFigureByIndex(move.targetSquare, board)
     let color = square.color != FigureColorType.ClearBoard ? 'red' : 'yellow'
-    setSquareColor(move.targetSquare, color, itemRefs)
+    setSquareColor(move.targetSquare, color, arrayOfStyles)
   })
-  setSquareColor(index, 'purple', itemRefs)
+  setSquareColor(index, 'purple', arrayOfStyles)
 }
 
 function generateMoves(): void {

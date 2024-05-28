@@ -1,7 +1,7 @@
 <template>
   <div
     class="board-square"
-    :class="{ 'has-piece': piece && piece.type !== FigureType.ClearBoard }"
+    :class="squareStyle"
     :index="index"
     ref="itemRef"
     draggable="false"
@@ -23,7 +23,7 @@
 import { FigureType } from '@/enums/figure'
 import { getSquareIndexByCords, getFigures } from '@/scripts/chess/chessHelpers'
 import type { Figure } from '@/types/chessTypes'
-import { ref, type PropType } from 'vue'
+import { computed, ref, watchEffect, type PropType } from 'vue'
 
 const props = defineProps({
   rowIndex: { type: Number, default: 0 },
@@ -31,7 +31,13 @@ const props = defineProps({
   piece: {
     type: Object as PropType<Figure>,
     required: true
-  }
+  },
+  style: { type: String, default: '' }
+})
+
+const squareStyle = ref(props.style)
+watchEffect(() => {
+  squareStyle.value = props.style
 })
 
 const emits = defineEmits<{
