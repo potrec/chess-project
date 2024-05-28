@@ -1,6 +1,6 @@
 import type { NumSquaresToEdge, Figure } from "@/types/chessTypes"
 import { FigureColorType, FigureType } from "@/enums/figure"
-import { reactive } from 'vue'
+import { reactive, type Ref } from 'vue'
 import { isUpperCase } from "@/helpers/isUpperCase"
 import { pieceTypeFromSymbol } from '@/constants/chess/piece'
 export function getNumberOfSquaresInDirection(startSquare: number, directionIndex: number, arrayOfSquaresToEdge: NumSquaresToEdge[]): number {
@@ -80,20 +80,12 @@ export function setMoveData(): NumSquaresToEdge[] {
 }
 
 
-export function setSquareColor(squareIndex: number, colorClass: string, itemRefs: any) {
-  const targetElement = itemRefs.value.find(element => element.getAttribute('index') === squareIndex.toString());
-  if (targetElement) {
-    targetElement.classList.add(colorClass);
-  }
+export function setSquareColor(squareIndex: number, colorClass: string, arrayOfStyles: Ref<string[]>) {
+  arrayOfStyles.value[squareIndex] = colorClass
 }
 
-export function removeSquareColor(squareIndex: number, colorClasses: string[], itemRefs: any) {
-  const targetElement = itemRefs.value.find(element => element.getAttribute('index') === squareIndex.toString());
-  if (targetElement) {
-    colorClasses.forEach(className => {
-      targetElement.classList.remove(className);
-    });
-  }
+export function removeSquareColor(squareIndex: number, arrayOfStyles: Ref<string[]>) {
+  arrayOfStyles.value[squareIndex] = ''
 }
 
 export function getFigures(figure: Figure): string {

@@ -2,26 +2,18 @@
   <div class="main-container">
     <div class="board-container">
       <div class="board-line" v-for="(line, i) in board.squares" :key="i">
-        <div
-          class="board-square"
+        <ChessBoardSquare
           v-for="(square, j) in line"
           :key="j"
-          :index="getSquareIndexByCords(i, j)"
-          ref="itemRefs"
-          draggable="false"
-          v-on:dragenter="handleDragEnter($event, square, i, j)"
-          v-on:dragend="handleDragEnd($event, square)"
-          @click="onClick(square, getSquareIndexByCords(i, j))"
-        >
-          <img
-            class="figure"
-            v-if="square.type != FigureType.ClearBoard"
-            :src="getFigures(square)"
-            draggable="true"
-            v-on:dragstart="handleDragStart($event, getSquareIndexByCords(i, j))"
-          />
-          {{ getSquareIndexByCords(i, j) }}
-        </div>
+          :piece="square"
+          :row-index="i"
+          :col-index="j"
+          :style="arrayOfStyles[getSquareIndexByCords(i, j)]"
+          @handleDragStart="handleDragStart"
+          @handleDragEnd="handleDragEnd"
+          @onClick="onClick"
+          @handleDragEnter="handleDragEnter"
+        />
       </div>
     </div>
   </div>
@@ -30,14 +22,13 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { FigureColorType, FigureType } from '@/enums/figure'
-import type { Figure, TempFigure, NumSquaresToEdge, Move } from '@/types/chessTypes'
+import type { Figure, NumSquaresToEdge } from '@/types/chessTypes'
 import {
   getFigureByIndex,
   setMoveData,
   deleteFigureImage,
   loadPositionFromFen,
   setSquareColor,
-  getFigures,
   getSquareIndexByCords,
   removeSquareColor,
   getIndexesByFigureIndex
@@ -48,45 +39,56 @@ import {
   generateStraightMoves,
   generateKingMoves
 } from '@/scripts/chess/chessMoves'
-
+import ChessBoardSquare from '@/components/chess/ChessBoardSquare.vue'
 const props = defineProps({
   playerColor: {
     type: FigureColorType,
     default: FigureColorType.White
+  },
+  fen: {
+    type: String,
+    default: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
   }
 })
-const itemRefs = ref<any>([])
-const arrayOfSquaresToEdge: NumSquaresToEdge[] = setMoveData()
 
-const startFEN: string = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
-const otherFEN: string = 'r1bk3r/p2pBpNp/n4n2/1p1NP2P/6P1/3P4/P1P1K3/q5b1 b - - 1 23'
-const knightFEN: string = '8/8/8/4n3/8/8/8/8'
+const arrayOfSquaresToEdge: NumSquaresToEdge[] = setMoveData()
+const arrayOfStyles = ref([])
+for (var i = 0; i < 64; i++) {
+  arrayOfStyles.value.push('')
+}
 
 let currentPlayer = FigureColorType.White
 let selectedSquare = 64
 
-var board = loadPositionFromFen(otherFEN)
+var board = loadPositionFromFen(props.fen)
 
-var dragStartSquare: number
-var dragEndSquare: number
+const dragStartSquare = ref(0)
+const dragEndSquare = ref(0)
 
 generateMoves()
 
 function handleDragStart(event: MouseEvent, figure: number) {
-  dragStartSquare = figure
-  dragEndSquare = figure
+  console.log('dragStart', figure)
+  dragStartSquare.value = figure
+  dragEndSquare.value = figure
+}
+
+function handleDragEnter(event: MouseEvent, figure: Figure, i: number, j: number) {
+  event.preventDefault()
+  dragEndSquare.value = getSquareIndexByCords(i, j)
 }
 
 function handleDragEnd(event: MouseEvent, figure: Figure) {
+  console.log('dragEnd', figure)
   if (!figure.moves) return 0
   if (props.playerColor != currentPlayer) return 0
   if (props.playerColor != figure.color) return 0
-  if (dragStartSquare == dragEndSquare) return 0
+  if (dragStartSquare.value == dragEndSquare.value) return 0
   let targetMoves: number[] = figure.moves.map((move) => move.targetSquare)
-  if (!targetMoves.includes(dragEndSquare)) return 0 // todo":play sound or alert the player that he can't move there
-  let startFigure = getFigureByIndex(dragStartSquare, board)
+  if (!targetMoves.includes(dragEndSquare.value)) return 0 // todo":play sound or alert the player that he can't move there
+  let startFigure = getFigureByIndex(dragStartSquare.value, board)
   deleteFigureImage(board, startFigure)
-  const { x: x, y: y } = getIndexesByFigureIndex(dragEndSquare)
+  const { x: x, y: y } = getIndexesByFigureIndex(dragEndSquare.value)
   figure.rank = 8 - x
   figure.file = String.fromCharCode(97 + y)
   board.squares[x][y] = figure
@@ -98,17 +100,12 @@ function handleDragEnd(event: MouseEvent, figure: Figure) {
   generateMoves()
 }
 
-function handleDragEnter(event: MouseEvent, figure: Figure, i: number, j: number) {
-  event.preventDefault()
-  dragEndSquare = getSquareIndexByCords(i, j)
-}
-
 function onClick(figure: Figure, index: number) {
   if (!figure.moves) {
     return 0
   }
   for (let i = 0; i < 64; i++) {
-    removeSquareColor(i, ['red', 'yellow', 'purple'], itemRefs)
+    removeSquareColor(i, arrayOfStyles)
   }
   if (selectedSquare == index) {
     selectedSquare = 65
@@ -118,9 +115,9 @@ function onClick(figure: Figure, index: number) {
   figure.moves.forEach((move) => {
     let square = getFigureByIndex(move.targetSquare, board)
     let color = square.color != FigureColorType.ClearBoard ? 'red' : 'yellow'
-    setSquareColor(move.targetSquare, color, itemRefs)
+    setSquareColor(move.targetSquare, color, arrayOfStyles)
   })
-  setSquareColor(index, 'purple', itemRefs)
+  setSquareColor(index, 'purple', arrayOfStyles)
 }
 
 function generateMoves(): void {
