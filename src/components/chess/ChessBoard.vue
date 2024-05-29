@@ -42,7 +42,7 @@ import {
 import ChessBoardSquare from '@/components/chess/ChessBoardSquare.vue'
 const props = defineProps({
   playerColor: {
-    type: FigureColorType,
+    type: Object,
     default: FigureColorType.White
   },
   fen: {
@@ -79,10 +79,9 @@ function handleDragEnter(event: MouseEvent, figure: Figure, i: number, j: number
 }
 
 function handleDragEnd(event: MouseEvent, figure: Figure) {
-  console.log('dragEnd', figure)
   if (!figure.moves) return 0
-  if (props.playerColor != currentPlayer) return 0
-  if (props.playerColor != figure.color) return 0
+  // if (props.playerColor != currentPlayer) return 0
+  // if (props.playerColor != figure.color) return 0
   if (dragStartSquare.value == dragEndSquare.value) return 0
   let targetMoves: number[] = figure.moves.map((move) => move.targetSquare)
   if (!targetMoves.includes(dragEndSquare.value)) return 0 // todo":play sound or alert the player that he can't move there

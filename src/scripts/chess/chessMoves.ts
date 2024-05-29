@@ -1,5 +1,5 @@
 import { FigureColorType, FigureType } from "@/enums/figure"
-import type { Move, NumSquaresToEdge } from "@/types/chessTypes"
+import type { Figure, Move, NumSquaresToEdge } from "@/types/chessTypes"
 import { getFigureByIndex, getNumberOfSquaresInDirection, getSquareIndexByCords, getIndexesByFigureIndex} from "./chessHelpers"
 import { directionOffsets } from "@/constants/chess/piece"
 
@@ -9,9 +9,7 @@ export function generateSlidingMoves(startSquare: number, board: any, arrayOfSqu
   const startDirIndex = selectedFigure.type == FigureType.Bishop ? 4 : 0
   const endDirIndex = selectedFigure.type == FigureType.Rook ? 4 : 8
   const moves: Move[] = []
-
   for (let directionIndex = startDirIndex; directionIndex < endDirIndex; directionIndex++) {
-    //todo: check black rook when in start situation
     const numberOfSquaresInDirection = getNumberOfSquaresInDirection(startSquare, directionIndex, arrayOfSquaresToEdge)
     for (let n = 0; n < numberOfSquaresInDirection; n++) {
       const targetSquare = startSquare + directionOffsets[directionIndex] * (n + 1)
@@ -48,6 +46,14 @@ export function generateStraightMoves(startSquare: number, board: any, arrayOfSq
         continue
       }
       if((i == 0) && !((selectedFigure.color == FigureColorType.White && selectedFigure.rank == 2) || (selectedFigure.color == FigureColorType.Black && selectedFigure.rank == 7)))
+      {
+        continue
+      }
+      if((canMoveOnX[i] == 1 || canMoveOnX[i] == -1) && canMoveOnY[i] == 0 && getFigureByIndex(getSquareIndexByCords(x-canMoveOnX[i], y-canMoveOnY[i]),board).type == 2)
+      {
+        continue
+      }
+      if((canMoveOnX[i] == 1 || canMoveOnX[i] == -1) && (canMoveOnY[i] == 1 || canMoveOnY[i] == -1) && checkIfEnemyOnTile(targetSquare, board, figure) == false)
       {
         continue
       }
@@ -111,4 +117,22 @@ export function generateKingMoves(startSquare: number, board: any): Move[]
   //roszada
   
   return moves
+}
+
+export function checkIfKingSafe(move: Move, board: any): Boolean 
+{
+
+  return true
+}
+
+export function upgradeFigure(figure: Figure, board: any)
+{
+
+}
+
+export function checkIfEnemyOnTile(squareIndex: number, board: any, figure: Figure): boolean
+{
+  const square = getFigureByIndex(squareIndex, board);
+  if ( square.type != FigureType.ClearBoard && square.color != FigureColorType.ClearBoard && square.color == figure.color) return true
+  return false
 }
