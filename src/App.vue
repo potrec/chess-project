@@ -1,7 +1,7 @@
 <template>
   <div class="main-view">
     <SiteNavigation />
-    <ChessBoard :playerColor="FigureColorType.White" :fen="startFEN" />
+    <ChessBoard :playerColor="FigureColorType.White" :fen="kingsFEN" />
     <!-- <PlayModal :modalActive="modalActive" /> -->
     <RouterView />
   </div>
@@ -23,6 +23,7 @@ const toggleModal = () => {
 const startFEN: string = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
 const otherFEN: string = 'r1bk3r/p2pBpNp/n4n2/1p1NP2P/6P1/3P4/P1P1K3/q5b1 b - - 1 23'
 const knightFEN: string = '8/8/8/4n3/8/8/8/8'
+const kingsFEN: string = 'r3k2r/8/8/8/8/8/8/R3K2R'
 </script>
 
 <style scoped></style>

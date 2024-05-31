@@ -1,20 +1,42 @@
 <template>
   <div class="main-container">
-    <div class="board-container">
-      <div class="board-line" v-for="(line, i) in board.squares" :key="i">
-        <ChessBoardSquare
-          v-for="(square, j) in line"
-          :key="j"
-          :piece="square"
-          :row-index="i"
-          :col-index="j"
-          :style="arrayOfStyles[getSquareIndexByCords(i, j)]"
-          @handleDragStart="handleDragStart"
-          @handleDragEnd="handleDragEnd"
-          @onClick="onClick"
-          @handleDragEnter="handleDragEnter"
-        />
+    <div class="board-main-components">
+      <div class="board-info-rank">
+        <div class="board-info-item">8</div>
+        <div class="board-info-item">7</div>
+        <div class="board-info-item">6</div>
+        <div class="board-info-item">5</div>
+        <div class="board-info-item">4</div>
+        <div class="board-info-item">3</div>
+        <div class="board-info-item">2</div>
+        <div class="board-info-item">1</div>
       </div>
+      <div class="board-container">
+        <div class="board-line" v-for="(line, i) in board.squares" :key="i">
+          <ChessBoardSquare
+            v-for="(square, j) in line"
+            :key="j"
+            :piece="square"
+            :row-index="i"
+            :col-index="j"
+            :style="arrayOfStyles[getSquareIndexByCords(i, j)]"
+            @handleDragStart="handleDragStart"
+            @handleDragEnd="handleDragEnd"
+            @onClick="onClick"
+            @handleDragEnter="handleDragEnter"
+          />
+        </div>
+      </div>
+    </div>
+    <div class="board-info-file">
+      <div class="board-info-item">A</div>
+      <div class="board-info-item">B</div>
+      <div class="board-info-item">C</div>
+      <div class="board-info-item">D</div>
+      <div class="board-info-item">E</div>
+      <div class="board-info-item">F</div>
+      <div class="board-info-item">G</div>
+      <div class="board-info-item">H</div>
     </div>
   </div>
 </template>
@@ -140,7 +162,7 @@ function generateMoves(): void {
       // console.log(piece.moves)
     }
     if (piece.type == FigureType.King) {
-      piece.moves = generateKingMoves(startSquare, board)
+      piece.moves = generateKingMoves(startSquare, board, arrayOfSquaresToEdge)
     }
   }
 }
