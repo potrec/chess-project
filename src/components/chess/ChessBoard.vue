@@ -2,14 +2,14 @@
   <div class="main-container">
     <div class="board-main-components">
       <div class="board-info-rank">
-        <div class="board-info-item">8</div>
-        <div class="board-info-item">7</div>
-        <div class="board-info-item">6</div>
-        <div class="board-info-item">5</div>
-        <div class="board-info-item">4</div>
-        <div class="board-info-item">3</div>
-        <div class="board-info-item">2</div>
-        <div class="board-info-item">1</div>
+        <div class="board-info-item-vertical">8</div>
+        <div class="board-info-item-vertical">7</div>
+        <div class="board-info-item-vertical">6</div>
+        <div class="board-info-item-vertical">5</div>
+        <div class="board-info-item-vertical">4</div>
+        <div class="board-info-item-vertical">3</div>
+        <div class="board-info-item-vertical">2</div>
+        <div class="board-info-item-vertical">1</div>
       </div>
       <div class="board-container">
         <div class="board-line" v-for="(line, i) in board.squares" :key="i">
@@ -29,14 +29,14 @@
       </div>
     </div>
     <div class="board-info-file">
-      <div class="board-info-item">A</div>
-      <div class="board-info-item">B</div>
-      <div class="board-info-item">C</div>
-      <div class="board-info-item">D</div>
-      <div class="board-info-item">E</div>
-      <div class="board-info-item">F</div>
-      <div class="board-info-item">G</div>
-      <div class="board-info-item">H</div>
+      <div class="board-info-item-horizontal">A</div>
+      <div class="board-info-item-horizontal">B</div>
+      <div class="board-info-item-horizontal">C</div>
+      <div class="board-info-item-horizontal">D</div>
+      <div class="board-info-item-horizontal">E</div>
+      <div class="board-info-item-horizontal">F</div>
+      <div class="board-info-item-horizontal">G</div>
+      <div class="board-info-item-horizontal">H</div>
     </div>
   </div>
 </template>
