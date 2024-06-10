@@ -195,3 +195,9 @@ export function getColorAndRank(value: number): { color: FigureColorType; rank: 
     { color: FigureColorType.White, rank: 1 } :
     { color: FigureColorType.Black, rank: 8 };
 }
+
+export function clearBoardFromColors(arrayOfStyles: Ref<string[]>) {
+  for (let i = 0; i < 64; i++) {
+    removeSquareColor(i, arrayOfStyles)
+  }
+}

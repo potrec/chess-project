@@ -42,7 +42,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, type Ref } from 'vue'
 import { FigureColorType, FigureType, MoveType } from '@/enums/figure'
 import type { Figure, NumSquaresToEdge } from '@/types/chessTypes'
 import {
@@ -56,7 +56,8 @@ import {
   getIndexesByFigureIndex,
   getFigureMoveByIndex,
   addFigureToBoard,
-  getColorAndRank
+  getColorAndRank,
+  clearBoardFromColors
 } from '@/scripts/chess/chessHelpers'
 import {
   generateSlidingMoves,
@@ -142,6 +143,7 @@ function handleDragEnd(event: MouseEvent, figure: Figure) {
   } else {
     currentPlayer = FigureColorType.Black
   }
+  clearBoardFromColors(arrayOfStyles)
   generateMoves()
 }
 
@@ -150,9 +152,7 @@ function onClick(figure: Figure, index: number) {
   if (!figure.moves) {
     return 0
   }
-  for (let i = 0; i < 64; i++) {
-    removeSquareColor(i, arrayOfStyles)
-  }
+  clearBoardFromColors(arrayOfStyles)
   if (selectedSquare == index) {
     selectedSquare = 65
     return 0
