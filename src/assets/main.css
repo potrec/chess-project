@@ -94,6 +94,9 @@ img {
 .purple {
     background-color: var(--purple) !important;
 }
+.light-blue{
+    background-color: var(--light-blue) !important;
+}
 .modal{
     position: fixed;
     z-index: 1;

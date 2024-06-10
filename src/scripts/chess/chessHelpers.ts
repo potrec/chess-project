@@ -1,5 +1,5 @@
-import type { NumSquaresToEdge, Figure } from "@/types/chessTypes"
-import { FigureColorType, FigureType } from "@/enums/figure"
+import type { NumSquaresToEdge, Figure, Move } from "@/types/chessTypes"
+import { FigureColorType, FigureType, MoveType } from "@/enums/figure"
 import { reactive, type Ref } from 'vue'
 import { isUpperCase } from "@/helpers/isUpperCase"
 import { pieceTypeFromSymbol } from '@/constants/chess/piece'
@@ -121,7 +121,7 @@ export function getFigureTypeByString(fenSymbol: string): FigureType | undefined
   return piece ? piece.figure : undefined
 }
 
-export function deleteFigureImage(board: any, dragStartSquare: Figure) {
+export function deleteFigureFromBoard(board: any, dragStartSquare: Figure) {
   const clearSquare: Figure = {
     type: FigureType.ClearBoard,
     color: FigureColorType.ClearBoard,
@@ -130,6 +130,11 @@ export function deleteFigureImage(board: any, dragStartSquare: Figure) {
     moves: []
   };
   board.squares[8-dragStartSquare.rank][dragStartSquare.file.charCodeAt(0) - 97] = clearSquare
+}
+
+export function addFigureToBoard(board: any, figure: Figure)
+{
+  board.squares[8-figure.rank][figure.file.charCodeAt(0) - 97] = figure
 }
 
 export function loadPositionFromFen(fen: string) {
@@ -170,4 +175,23 @@ export function loadPositionFromFen(fen: string) {
     }
   }
   return board
+}
+
+export function getFigureIndexByFigure(figure: Figure): number {
+  return  (figure.rank-1) * 8 + (figure.file.charCodeAt(0) - 97)
+}
+
+export function getFigureToString(figure: Figure) {
+  console.log("color: ",figure.color," type: ",figure.type," rank: ",figure.rank, " file: ",figure.file," moves: ",figure.moves)
+}
+
+export function getFigureMoveByIndex(figure: Figure, index: number): MoveType | undefined
+{
+  return figure.moves.find(move => move.targetSquare == index)?.moveType
+}
+
+export function getColorAndRank(value: number): { color: FigureColorType; rank: number } {
+  return value < 7? 
+    { color: FigureColorType.White, rank: 1 } :
+    { color: FigureColorType.Black, rank: 8 };
 }

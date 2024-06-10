@@ -14,3 +14,10 @@ export enum FigureType {
   Queen = 6
 }
 
+export enum MoveType {
+  Move = 0,
+  Attack = 1,
+  Castling = 2,
+  Promotion = 3
+}
+

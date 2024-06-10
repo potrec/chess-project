@@ -1,6 +1,6 @@
-import { FigureColorType, FigureType } from "@/enums/figure"
+import { FigureColorType, FigureType, MoveType } from "@/enums/figure"
 import type { Figure, Move, NumSquaresToEdge } from "@/types/chessTypes"
-import { getFigureByIndex, getNumberOfSquaresInDirection, getSquareIndexByCords, getIndexesByFigureIndex} from "./chessHelpers"
+import { getFigureByIndex, getNumberOfSquaresInDirection, getSquareIndexByCords, getIndexesByFigureIndex, getFigureIndexByFigure, getFigureToString} from "./chessHelpers"
 import { directionOffsets } from "@/constants/chess/piece"
 
 export function generateSlidingMoves(startSquare: number, board: any, arrayOfSquaresToEdge: NumSquaresToEdge[]): Move[] 
@@ -17,8 +17,12 @@ export function generateSlidingMoves(startSquare: number, board: any, arrayOfSqu
       if (selectedFigure.color == figure.color) {
         break
       }
-      moves.push({ startSquare, targetSquare })
-      if (selectedFigure.color != figure.color && figure.color != FigureColorType.ClearBoard) {
+      if( figure.color == FigureColorType.ClearBoard)
+      {
+        moves.push({ startSquare, targetSquare, moveType: MoveType.Move })
+      }
+      else{
+        moves.push({ startSquare, targetSquare, moveType: MoveType.Attack }) 
         break
       }
     }
@@ -57,9 +61,13 @@ export function generateStraightMoves(startSquare: number, board: any, arrayOfSq
       {
         continue
       }
-      moves.push({ startSquare, targetSquare })
-      if (selectedFigure.color != figure.color && figure.color != FigureColorType.ClearBoard) {
-        continue
+      if( figure.color == FigureColorType.ClearBoard)
+      {
+        moves.push({ startSquare, targetSquare, moveType: MoveType.Move })
+      }
+      else{
+        moves.push({ startSquare, targetSquare, moveType: MoveType.Attack }) 
+        break
       }
     }
   }
@@ -83,16 +91,20 @@ export function generateKnightMoves(startSquare: number, board: any, arrayOfSqua
       if (selectedFigure.color == figure.color) {
         continue
       }
-      moves.push({ startSquare, targetSquare })
-      if (selectedFigure.color != figure.color && figure.color != FigureColorType.ClearBoard) {
-        continue
+      if( figure.color == FigureColorType.ClearBoard)
+      {
+        moves.push({ startSquare, targetSquare, moveType: MoveType.Move })
+      }
+      else{
+        moves.push({ startSquare, targetSquare, moveType: MoveType.Attack }) 
+        break
       }
     }
   }
   return moves
 }
 
-export function generateKingMoves(startSquare: number, board: any): Move[]
+export function generateKingMoves(startSquare: number, board: any, arrayOfSquaresToEdge: NumSquaresToEdge[]): Move[]
 {
   const selectedFigure = getFigureByIndex(startSquare,board)
   const moves: Move[] = []
@@ -108,9 +120,42 @@ export function generateKingMoves(startSquare: number, board: any): Move[]
       if (selectedFigure.color == figure.color) {
         continue
       }
-      moves.push({ startSquare, targetSquare })
-      if (selectedFigure.color != figure.color && figure.color != FigureColorType.ClearBoard) {
+      if( figure.color == FigureColorType.ClearBoard)
+      {
+        moves.push({ startSquare, targetSquare, moveType: MoveType.Move })
+      }
+      else{
+        moves.push({ startSquare, targetSquare, moveType: MoveType.Attack }) 
+        break
+      }
+    }
+  }
+  if((startSquare == 4 && selectedFigure.color == FigureColorType.White) || (startSquare == 60 && selectedFigure.color == FigureColorType.Black))
+  {
+    for(let i = 1; i <= 3; i++)
+    {
+      const target = getFigureByIndex(startSquare+i,board)
+      if(target.type == FigureType.Rook && i == 3)
+      {
+        moves.push({ startSquare,targetSquare: getFigureIndexByFigure(target)-1, moveType: MoveType.Castling})
         continue
+      }
+      if(target.type != FigureType.ClearBoard)
+      {
+        break
+      }
+    }
+    for(let i = 1; i <= 4; i++)
+    {
+      const target = getFigureByIndex(startSquare-i,board)
+      if(target.type == FigureType.Rook && i == 4)
+      {
+        moves.push({ startSquare,targetSquare: getFigureIndexByFigure(target)+2, moveType: MoveType.Castling})
+        continue
+      }
+      if(target.type != FigureType.ClearBoard)
+      {
+        break
       }
     }
   }

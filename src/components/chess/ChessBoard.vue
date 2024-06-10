@@ -43,17 +43,20 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { FigureColorType, FigureType } from '@/enums/figure'
+import { FigureColorType, FigureType, MoveType } from '@/enums/figure'
 import type { Figure, NumSquaresToEdge } from '@/types/chessTypes'
 import {
   getFigureByIndex,
   setMoveData,
-  deleteFigureImage,
+  deleteFigureFromBoard,
   loadPositionFromFen,
   setSquareColor,
   getSquareIndexByCords,
   removeSquareColor,
-  getIndexesByFigureIndex
+  getIndexesByFigureIndex,
+  getFigureMoveByIndex,
+  addFigureToBoard,
+  getColorAndRank
 } from '@/scripts/chess/chessHelpers'
 import {
   generateSlidingMoves,
@@ -108,7 +111,28 @@ function handleDragEnd(event: MouseEvent, figure: Figure) {
   let targetMoves: number[] = figure.moves.map((move) => move.targetSquare)
   if (!targetMoves.includes(dragEndSquare.value)) return 0 // todo":play sound or alert the player that he can't move there
   let startFigure = getFigureByIndex(dragStartSquare.value, board)
-  deleteFigureImage(board, startFigure)
+  console.log(dragEndSquare.value)
+  switch (getFigureMoveByIndex(figure, dragEndSquare.value)) {
+    case MoveType.Castling: {
+      const { color, rank } = getColorAndRank(dragEndSquare.value)
+      const offset = dragEndSquare.value < 7 ? 1 : -2
+      const file = dragEndSquare.value < 7 ? 'f' : 'd'
+
+      deleteFigureFromBoard(board, getFigureByIndex(dragEndSquare.value + offset, board))
+      let rook: Figure = { type: FigureType.Rook, color, file, rank, moves: [] }
+      addFigureToBoard(board, rook)
+      console.log('castling', dragEndSquare.value)
+      break
+    }
+    case MoveType.Move:
+      console.log('move')
+      break
+    case MoveType.Promotion:
+      console.log('promotion')
+      break
+  }
+
+  deleteFigureFromBoard(board, startFigure)
   const { x: x, y: y } = getIndexesByFigureIndex(dragEndSquare.value)
   figure.rank = 8 - x
   figure.file = String.fromCharCode(97 + y)
@@ -122,6 +146,7 @@ function handleDragEnd(event: MouseEvent, figure: Figure) {
 }
 
 function onClick(figure: Figure, index: number) {
+  //console.log()
   if (!figure.moves) {
     return 0
   }
@@ -133,9 +158,18 @@ function onClick(figure: Figure, index: number) {
     return 0
   }
   selectedSquare = index
+  console.log(figure)
   figure.moves.forEach((move) => {
-    let square = getFigureByIndex(move.targetSquare, board)
-    let color = square.color != FigureColorType.ClearBoard ? 'red' : 'yellow'
+    let color = ''
+    if (move.moveType === MoveType.Move) {
+      color = 'yellow'
+    }
+    if (move.moveType === MoveType.Attack) {
+      color = 'red'
+    }
+    if (move.moveType === MoveType.Castling) {
+      color = 'light-blue'
+    }
     setSquareColor(move.targetSquare, color, arrayOfStyles)
   })
   setSquareColor(index, 'purple', arrayOfStyles)
@@ -159,7 +193,6 @@ function generateMoves(): void {
     }
     if (piece.type == FigureType.Pawn) {
       piece.moves = generateStraightMoves(startSquare, board, arrayOfSquaresToEdge)
-      // console.log(piece.moves)
     }
     if (piece.type == FigureType.King) {
       piece.moves = generateKingMoves(startSquare, board, arrayOfSquaresToEdge)

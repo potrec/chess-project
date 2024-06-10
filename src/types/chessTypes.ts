@@ -1,4 +1,4 @@
-import type { FigureType, FigureColorType } from '@/enums/figure'
+import type { FigureType, FigureColorType, MoveType } from '@/enums/figure'
 
 export type Figure = {
   type: FigureType
@@ -21,6 +21,7 @@ export type TempFigure = {
 export type Move = {
   startSquare: number
   targetSquare: number
+  moveType: MoveType
 }
 
 export type NumSquaresToEdge = {
