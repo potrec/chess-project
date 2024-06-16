@@ -8,7 +8,6 @@ export function saveChessHistory(history:any, figure: Figure, moveType: MoveType
 
 export function parseHistoryToJSON(history)
 {
-
 }
 
 export function getPieceData(figure: Figure): string

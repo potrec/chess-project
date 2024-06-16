@@ -1,15 +1,33 @@
 <template>
   <div class="main-container">
-    <div class="board-main-components">
-      <div class="board-info-rank">
-        <div class="board-info-item-vertical">8</div>
-        <div class="board-info-item-vertical">7</div>
-        <div class="board-info-item-vertical">6</div>
-        <div class="board-info-item-vertical">5</div>
-        <div class="board-info-item-vertical">4</div>
-        <div class="board-info-item-vertical">3</div>
-        <div class="board-info-item-vertical">2</div>
-        <div class="board-info-item-vertical">1</div>
+    <!-- <div class="player-row-component player-row-top">
+      <img class="player-row-avatar" src="/public/favicon.ico" />
+      <div class="player-row-info">
+        <div class="player-row-name">Player 1</div>
+        <div class="player-row-ranking">Ranking: 0</div>
+        <div class="player-row-country-flag">POLAND</div>
+      </div>
+    </div> -->
+    <div class="board-wrapper">
+      <div class="board-container-row-info">
+        <div class="board-info-rank">8</div>
+        <div class="board-info-rank">7</div>
+        <div class="board-info-rank">6</div>
+        <div class="board-info-rank">5</div>
+        <div class="board-info-rank">4</div>
+        <div class="board-info-rank">3</div>
+        <div class="board-info-rank">2</div>
+        <div class="board-info-rank">1</div>
+      </div>
+      <div class="board-container-row-file">
+        <div class="board-info-file">A</div>
+        <div class="board-info-file">B</div>
+        <div class="board-info-file">C</div>
+        <div class="board-info-file">D</div>
+        <div class="board-info-file">E</div>
+        <div class="board-info-file">F</div>
+        <div class="board-info-file">G</div>
+        <div class="board-info-file">H</div>
       </div>
       <div class="board-container">
         <div class="board-line" v-for="(line, i) in board.squares" :key="i">
@@ -28,16 +46,7 @@
         </div>
       </div>
     </div>
-    <div class="board-info-file">
-      <div class="board-info-item-horizontal">A</div>
-      <div class="board-info-item-horizontal">B</div>
-      <div class="board-info-item-horizontal">C</div>
-      <div class="board-info-item-horizontal">D</div>
-      <div class="board-info-item-horizontal">E</div>
-      <div class="board-info-item-horizontal">F</div>
-      <div class="board-info-item-horizontal">G</div>
-      <div class="board-info-item-horizontal">H</div>
-    </div>
+    <div class="player-row-component player-row-bottom"></div>
   </div>
 </template>
 

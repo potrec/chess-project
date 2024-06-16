@@ -6,22 +6,20 @@ html, body {
   font-family: 'Roboto', sans-serif;
 }
 .main-view {
-  display: flex;
-  background-color: var(--primary);
-  height: 100vh;
-  align-items: flex-start;
-  justify-content: center;
-  flex-wrap: wrap;
+    display: flex;
+    background-color: var(--background);
+    height: 100vh;
+    flex-direction: column;
+    align-items: center;
 }
 .site-navigation{
     display: flex;
-    background-color: var(--primary);
+    background-color: var(--background);
     width: 100%;
     height: 5%;
     align-items: stretch;
     justify-content: center;
     gap: 10px;
-    box-shadow: 0px 1px 5px var(--secondary);
 }
 .button-navigation
 {
@@ -32,7 +30,7 @@ html, body {
 }
 .main-container {
     display: flex;
-    width: 50%;
+    height: 70%;
     aspect-ratio: 1/1;
     background-color: var(--secondary);
     flex-direction: column;
@@ -50,16 +48,28 @@ html, body {
     background-color: white;
     height: 10%;
 }
-.board-container {
-    display: flex;
-    flex-wrap: wrap;
-    align-content: center;
-    justify-content: center;
-    aspect-ratio: 1/1;
-    width: 95%;
-    border-left: 1px solid black;
-    border-bottom: 1px solid black;
+.board-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
 }
+
+.board-container-row-info {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  height: inherit;
+  width: 100%;
+  pointer-events: none;
+}
+
+.board-container {
+  position: relative;
+  z-index: 1;
+}
+
 .board-line {
     display: flex;
     flex-direction: row;
@@ -67,9 +77,12 @@ html, body {
     height: 12.5%;
 }
 .board-square {
+    display: flex;
     width: 12.5%;
-    aspect-ratio: 1/1;
+    aspect-ratio: 1 / 1;
     background-color: var(--primary);
+    justify-content: center;
+    align-items: center;
 }
 .board-line:nth-child(even)
 .board-square:nth-child(even)
@@ -81,7 +94,7 @@ html, body {
 {
     background-color: var(--secondary);
 }
-img {
+.figure {
     width: 100%;
     height: 100%;
 }
@@ -158,7 +171,7 @@ button
     color: var(--white);
 }
 .board-info-rank{
-    height: 100%;
+    height: 12.5%;
     width: 5%;
 }
 .board-info-item-horizontal{
@@ -176,12 +189,46 @@ button
     justify-content: center;
 }
 .board-info-file{
-    padding-left: 5%;
-    width: 95%;
-    display: flex;
-    height: 5%;
+    width: 12.5%;
+    text-align: end;
+    padding-right: 3px;
 }
 .board-main-components{
     display: flex;
     height: 95%;
+}
+.board-container-row-info {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%; 
+    pointer-events: none; 
+    z-index: 2;
+}
+.board-container-row-info .board-info-rank:nth-child(even) {
+    color: var(--secondary);
+}
+.board-container-row-info .board-info-rank:nth-child(odd) {
+    color: var(--primary);
+}
+.board-container-row-file{
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    height: 100%;
+    width: 100%;
+    pointer-events: none;
+    z-index: 2;
+    flex-direction: row;
+    align-items: flex-end;
+}
+.board-container-row-file .board-info-file:nth-child(even) {
+    color: var(--primary);
+}
+.board-container-row-file .board-info-file:nth-child(odd) {
+    color: var(--secondary);
 }
