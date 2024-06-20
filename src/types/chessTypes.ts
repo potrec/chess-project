@@ -34,3 +34,8 @@ export type NumSquaresToEdge = {
   minNE: number
   minSW: number
 }
+
+export type SquareAttack = {
+  square: number
+  attackingFigureColor: FigureColorType
+}

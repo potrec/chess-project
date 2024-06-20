@@ -46,6 +46,14 @@
         </div>
       </div>
     </div>
+    <div class="board-dev-tools">
+      <button @click="toggleModal">Toggle Modal</button>
+      <button @click="toggleAllAttackedSquares">Toggle All AttackedSquares</button>
+      <select v-model="attackSquaresColor">
+        <option :value="FigureColorType.White">White</option>
+        <option :value="FigureColorType.Black">Black</option>
+      </select>
+    </div>
     <div class="player-row-component player-row-bottom"></div>
   </div>
 </template>
@@ -53,7 +61,7 @@
 <script setup lang="ts">
 import { ref, type Ref } from 'vue'
 import { FigureColorType, FigureType, MoveType } from '@/enums/figure'
-import type { Figure, NumSquaresToEdge } from '@/types/chessTypes'
+import type { Figure, NumSquaresToEdge, SquareAttack } from '@/types/chessTypes'
 import {
   getFigureByIndex,
   setMoveData,
@@ -72,7 +80,8 @@ import {
   generateSlidingMoves,
   generateKnightMoves,
   generateStraightMoves,
-  generateKingMoves
+  generateKingMoves,
+  deleteUnsafeKingMoves
 } from '@/scripts/chess/chessMoves'
 import ChessBoardSquare from '@/components/chess/ChessBoardSquare.vue'
 const props = defineProps({
@@ -91,7 +100,7 @@ const arrayOfStyles = ref([])
 for (var i = 0; i < 64; i++) {
   arrayOfStyles.value.push('')
 }
-
+let attackedSquaresIndex: SquareAttack[] = []
 let currentPlayer = FigureColorType.White
 let selectedSquare = 64
 
@@ -185,8 +194,9 @@ function onClick(figure: Figure, index: number) {
 }
 
 function generateMoves(): void {
-  for (var startSquare = 0; startSquare < 64; startSquare++) {
-    var piece = getFigureByIndex(startSquare, board)
+  attackedSquaresIndex = []
+  for (let startSquare = 0; startSquare < 64; startSquare++) {
+    let piece = getFigureByIndex(startSquare, board)
     if (piece == null) {
       continue
     }
@@ -206,6 +216,36 @@ function generateMoves(): void {
     if (piece.type == FigureType.King) {
       piece.moves = generateKingMoves(startSquare, board, arrayOfSquaresToEdge)
     }
+    if (piece.moves == null) {
+      continue
+    }
+    piece.moves.map((move) => {
+      attackedSquaresIndex.push({ square: move.targetSquare, attackingFigureColor: piece.color })
+    })
+  }
+  for (let i = 0; i < 64; i++) {
+    let piece = getFigureByIndex(i, board)
+    if (piece == null) {
+      continue
+    }
+    if (piece.type == FigureType.King) {
+      deleteUnsafeKingMoves(i, board, attackedSquaresIndex)
+    }
+  }
+}
+
+const toggleAttackSquares = ref(false)
+const attackSquaresColor = ref(FigureColorType.White)
+function toggleAllAttackedSquares() {
+  console.log(attackSquaresColor.value)
+  clearBoardFromColors(arrayOfStyles)
+  toggleAttackSquares.value = !toggleAttackSquares.value
+  if (toggleAttackSquares.value == true) {
+    attackedSquaresIndex
+      .filter((square) => square.attackingFigureColor == attackSquaresColor.value)
+      .forEach((square) => {
+        setSquareColor(square.square, 'red', arrayOfStyles)
+      })
   }
 }
 </script>

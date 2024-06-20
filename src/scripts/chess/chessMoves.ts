@@ -1,5 +1,5 @@
 import { FigureColorType, FigureType, MoveType } from "@/enums/figure"
-import type { Figure, Move, NumSquaresToEdge } from "@/types/chessTypes"
+import type { Figure, Move, NumSquaresToEdge, SquareAttack } from "@/types/chessTypes"
 import { getFigureByIndex, getNumberOfSquaresInDirection, getSquareIndexByCords, getIndexesByFigureIndex, getFigureIndexByFigure, getFigureToString} from "./chessHelpers"
 import { directionOffsets } from "@/constants/chess/piece"
 
@@ -159,15 +159,23 @@ export function generateKingMoves(startSquare: number, board: any, arrayOfSquare
       }
     }
   }
-  //roszada
-  
   return moves
+}
+
+export function deleteUnsafeKingMoves(startSquare: number,board: any, attackedSquaresIndex: SquareAttack[])
+{
+  const selectedFigure = getFigureByIndex(startSquare,board)
+  attackedSquaresIndex = attackedSquaresIndex.filter((element) => element.attackingFigureColor != selectedFigure.color)
+  const squaresToDelete = selectedFigure.moves.map((move) => move.targetSquare).filter((move) => {
+    return attackedSquaresIndex.map((element) => element.square).includes(move)
+  
+  })
+  selectedFigure.moves = selectedFigure.moves.filter((move) => !squaresToDelete.includes(move.targetSquare))
 }
 
 export function checkIfKingSafe(move: Move, board: any): Boolean 
 {
 
-  return true
 }
 
 export function upgradeFigure(figure: Figure, board: any)
