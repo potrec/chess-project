@@ -110,6 +110,9 @@ html, body {
 .light-blue{
     background-color: var(--light-blue) !important;
 }
+.gray{
+    background-color: var(--gray) !important;
+}
 .modal{
     position: fixed;
     z-index: 1;

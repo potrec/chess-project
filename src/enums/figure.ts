@@ -18,6 +18,7 @@ export enum MoveType {
   Move = 0,
   Attack = 1,
   Castling = 2,
-  Promotion = 3
+  Promotion = 3,
+  Pinned = 4
 }
 

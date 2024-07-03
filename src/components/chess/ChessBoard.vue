@@ -59,7 +59,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, type Ref } from 'vue'
+import { ref } from 'vue'
 import { FigureColorType, FigureType, MoveType } from '@/enums/figure'
 import type { Figure, NumSquaresToEdge, SquareAttack } from '@/types/chessTypes'
 import {
@@ -126,7 +126,7 @@ function handleDragEnd(event: MouseEvent, figure: Figure) {
   if (!figure.moves) return 0
   // if (props.playerColor != currentPlayer) return 0
   // if (props.playerColor != figure.color) return 0
-  if (dragStartSquare.value == dragEndSquare.value) return 0
+  if (dragStartSquare.value === dragEndSquare.value) return 0
   let targetMoves: number[] = figure.moves.map((move) => move.targetSquare)
   if (!targetMoves.includes(dragEndSquare.value)) return 0 // todo":play sound or alert the player that he can't move there
   let startFigure = getFigureByIndex(dragStartSquare.value, board)
@@ -171,7 +171,7 @@ function onClick(figure: Figure, index: number) {
     return 0
   }
   clearBoardFromColors(arrayOfStyles)
-  if (selectedSquare == index) {
+  if (selectedSquare === index) {
     selectedSquare = 65
     return 0
   }
@@ -188,6 +188,9 @@ function onClick(figure: Figure, index: number) {
     if (move.moveType === MoveType.Castling) {
       color = 'light-blue'
     }
+    if (move.moveType === MoveType.Pinned) {
+      color = 'gray'
+    }
     setSquareColor(move.targetSquare, color, arrayOfStyles)
   })
   setSquareColor(index, 'purple', arrayOfStyles)
@@ -201,26 +204,28 @@ function generateMoves(): void {
       continue
     }
     if (
-      piece.type == FigureType.Bishop ||
-      piece.type == FigureType.Queen ||
-      piece.type == FigureType.Rook
+      piece.type === FigureType.Bishop ||
+      piece.type === FigureType.Queen ||
+      piece.type === FigureType.Rook
     ) {
       piece.moves = generateSlidingMoves(startSquare, board, arrayOfSquaresToEdge)
     }
-    if (piece.type == FigureType.Knight) {
+    if (piece.type === FigureType.Knight) {
       piece.moves = generateKnightMoves(startSquare, board, arrayOfSquaresToEdge)
     }
-    if (piece.type == FigureType.Pawn) {
+    if (piece.type === FigureType.Pawn) {
       piece.moves = generateStraightMoves(startSquare, board, arrayOfSquaresToEdge)
     }
-    if (piece.type == FigureType.King) {
+    if (piece.type === FigureType.King) {
       piece.moves = generateKingMoves(startSquare, board, arrayOfSquaresToEdge)
     }
     if (piece.moves == null) {
       continue
     }
     piece.moves.map((move) => {
-      attackedSquaresIndex.push({ square: move.targetSquare, attackingFigureColor: piece.color })
+      if (move.moveType !== MoveType.Pinned) {
+        attackedSquaresIndex.push({ square: move.targetSquare, attackingFigureColor: piece.color })
+      }
     })
   }
   for (let i = 0; i < 64; i++) {
@@ -228,7 +233,7 @@ function generateMoves(): void {
     if (piece == null) {
       continue
     }
-    if (piece.type == FigureType.King) {
+    if (piece.type === FigureType.King) {
       deleteUnsafeKingMoves(i, board, attackedSquaresIndex)
     }
   }
@@ -240,9 +245,9 @@ function toggleAllAttackedSquares() {
   console.log(attackSquaresColor.value)
   clearBoardFromColors(arrayOfStyles)
   toggleAttackSquares.value = !toggleAttackSquares.value
-  if (toggleAttackSquares.value == true) {
+  if (toggleAttackSquares.value === true) {
     attackedSquaresIndex
-      .filter((square) => square.attackingFigureColor == attackSquaresColor.value)
+      .filter((square) => square.attackingFigureColor === attackSquaresColor.value)
       .forEach((square) => {
         setSquareColor(square.square, 'red', arrayOfStyles)
       })

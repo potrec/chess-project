@@ -23,7 +23,7 @@
 import { FigureType } from '@/enums/figure'
 import { getSquareIndexByCords, getFigures } from '@/scripts/chess/chessHelpers'
 import type { Figure } from '@/types/chessTypes'
-import { computed, ref, watchEffect, type PropType } from 'vue'
+import { ref, watchEffect, type PropType } from 'vue'
 
 const props = defineProps({
   rowIndex: { type: Number, default: 0 },

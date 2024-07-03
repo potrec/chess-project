@@ -10,19 +10,33 @@ export function generateSlidingMoves(startSquare: number, board: any, arrayOfSqu
   const endDirIndex = selectedFigure.type == FigureType.Rook ? 4 : 8
   const moves: Move[] = []
   for (let directionIndex = startDirIndex; directionIndex < endDirIndex; directionIndex++) {
+    let pinned = 0
     const numberOfSquaresInDirection = getNumberOfSquaresInDirection(startSquare, directionIndex, arrayOfSquaresToEdge)
     for (let n = 0; n < numberOfSquaresInDirection; n++) {
       const targetSquare = startSquare + directionOffsets[directionIndex] * (n + 1)
       const figure = getFigureByIndex(targetSquare,board)
       if (selectedFigure.color == figure.color) {
+        console.log('same color')
+        if(pinned == 0) 
+        { 
+          console.log('through color')
+          pinned += 1
+          continue
+        }
         break
       }
       if( figure.color == FigureColorType.ClearBoard)
       {
-        moves.push({ startSquare, targetSquare, moveType: MoveType.Move })
+        moves.push({ startSquare, targetSquare, moveType: pinned == 0 ? MoveType.Move : MoveType.Pinned})
       }
       else{
-        moves.push({ startSquare, targetSquare, moveType: MoveType.Attack }) 
+        if(pinned == 0) 
+        { 
+          moves.push({ startSquare, targetSquare, moveType: MoveType.Attack})
+          pinned += 1
+          continue
+        }
+        moves.push({ startSquare, targetSquare, moveType: MoveType.Pinned})
         break
       }
     }
