@@ -1,6 +1,6 @@
 import { FigureColorType, FigureType, MoveType } from "@/enums/figure"
 import type { Figure, Move, NumSquaresToEdge, SquareAttack } from "@/types/chessTypes"
-import { getFigureByIndex, getNumberOfSquaresInDirection, getSquareIndexByCords, getIndexesByFigureIndex, getFigureIndexByFigure, getFigureToString} from "./chessHelpers"
+import { getFigureByIndex, getNumberOfSquaresInDirection, getSquareIndexByCords, getIndexesByFigureIndex, getFigureIndexByFigure } from "./chessHelpers"
 import { directionOffsets } from "@/constants/chess/piece"
 
 export function generateSlidingMoves(startSquare: number, board: any, arrayOfSquaresToEdge: NumSquaresToEdge[]): Move[] 
@@ -16,10 +16,8 @@ export function generateSlidingMoves(startSquare: number, board: any, arrayOfSqu
       const targetSquare = startSquare + directionOffsets[directionIndex] * (n + 1)
       const figure = getFigureByIndex(targetSquare,board)
       if (selectedFigure.color == figure.color) {
-        console.log('same color')
         if(pinned == 0) 
         { 
-          console.log('through color')
           pinned += 1
           continue
         }
@@ -56,7 +54,7 @@ export function generateStraightMoves(startSquare: number, board: any, arrayOfSq
     const colorSwitch = selectedFigure.color == FigureColorType.White ? 1 : -1
     canMoveOnX[i] = canMoveOnX[i] * colorSwitch
     canMoveOnY[i] = canMoveOnY[i] * colorSwitch
-    if(!(x-canMoveOnX[i] < 0 || y-canMoveOnY[i] < 0 || !board.squares[x-canMoveOnX[i]] || !board.squares[x-canMoveOnX[i]][y-canMoveOnY[i]]))
+    if(!(x-canMoveOnX[i] < 0 || y-canMoveOnY[i] < 0 || !board.value[x-canMoveOnX[i]] || !board.value[x-canMoveOnX[i]][y-canMoveOnY[i]]))
     {
       const targetSquare = getSquareIndexByCords(x-canMoveOnX[i], y-canMoveOnY[i])
       const figure = getFigureByIndex(targetSquare,board)
@@ -98,7 +96,7 @@ export function generateKnightMoves(startSquare: number, board: any, arrayOfSqua
 
   for (let i = 0; i < 8; i++)
   {
-    if(!(x-canMoveOnX[i] < 0 || y-canMoveOnY[i] < 0 || !board.squares[x-canMoveOnX[i]] || !board.squares[x-canMoveOnX[i]][y-canMoveOnY[i]]))
+    if(!(x-canMoveOnX[i] < 0 || y-canMoveOnY[i] < 0 || !board.value[x-canMoveOnX[i]] || !board.value[x-canMoveOnX[i]][y-canMoveOnY[i]]))
     {
       const targetSquare = getSquareIndexByCords(x-canMoveOnX[i], y-canMoveOnY[i])
       const figure = getFigureByIndex(targetSquare,board)
@@ -127,7 +125,7 @@ export function generateKingMoves(startSquare: number, board: any, arrayOfSquare
   const canMoveOnY = [0, 0, 1, -1, 1, -1, 1, -1];
   for (let i = 0; i < 8; i++)
   {
-    if(!(x-canMoveOnX[i] < 0 || y-canMoveOnY[i] < 0 || !board.squares[x-canMoveOnX[i]] || !board.squares[x-canMoveOnX[i]][y-canMoveOnY[i]]))
+    if(!(x-canMoveOnX[i] < 0 || y-canMoveOnY[i] < 0 || !board.value[x-canMoveOnX[i]] || !board.value[x-canMoveOnX[i]][y-canMoveOnY[i]]))
     {
       const targetSquare = getSquareIndexByCords(x-canMoveOnX[i], y-canMoveOnY[i])
       const figure = getFigureByIndex(targetSquare,board)

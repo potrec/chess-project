@@ -1,6 +1,6 @@
-import type { NumSquaresToEdge, Figure, Move } from "@/types/chessTypes"
+import type { NumSquaresToEdge, Figure } from "@/types/chessTypes"
 import { FigureColorType, FigureType, MoveType } from "@/enums/figure"
-import { reactive, type Ref } from 'vue'
+import { reactive, ref, type Ref } from 'vue'
 import { isUpperCase } from "@/helpers/isUpperCase"
 import { pieceTypeFromSymbol } from '@/constants/chess/piece'
 export function getNumberOfSquaresInDirection(startSquare: number, directionIndex: number, arrayOfSquaresToEdge: NumSquaresToEdge[]): number {
@@ -37,7 +37,7 @@ export function getNumberOfSquaresInDirection(startSquare: number, directionInde
 }
 
 export function getFigureByIndex(index: number, board: any): Figure {
-  return board.squares[7 - Math.floor(index / 8)][index % 8] ?? null
+  return board.value[7 - Math.floor(index / 8)][index % 8] ?? null
 }
 
 export function getSquareIndexByCords(x: number ,y: number): number {
@@ -129,18 +129,15 @@ export function deleteFigureFromBoard(board: any, dragStartSquare: Figure) {
     rank: dragStartSquare.rank,
     moves: []
   };
-  board.squares[8-dragStartSquare.rank][dragStartSquare.file.charCodeAt(0) - 97] = clearSquare
+  board.value[8-dragStartSquare.rank][dragStartSquare.file.charCodeAt(0) - 97] = clearSquare
 }
 
 export function addFigureToBoard(board: any, figure: Figure)
 {
-  board.squares[8-figure.rank][figure.file.charCodeAt(0) - 97] = figure
+  board.value[8-figure.rank][figure.file.charCodeAt(0) - 97] = figure
 }
 
-export function loadPositionFromFen(fen: string) {
-  const board = reactive({
-    squares: Array.from({ length: 8 }, () => Array(8).fill(null))
-  })
+export function loadPositionFromFen(fen: string,board: Figure[][]) {
   const fenBoard: string = fen.split(' ')[0]
   let file: number = 0
   let rank: number = 8
@@ -153,28 +150,59 @@ export function loadPositionFromFen(fen: string) {
     } else {
       if (Number(symbol)) {
         for (let i = file; i < file + Number(symbol); i++) {
-          board.squares[index][i] = {
+          board[index][i] = {
             type: FigureType.ClearBoard,
             color: FigureColorType.ClearBoard,
             file: String.fromCharCode(97 + file),
-            rank: rank
+            rank: rank,
+            moves: []
           }
         }
         file += Number(symbol)
       } else {
         const pieceColor = isUpperCase(symbol) ? FigureColorType.White : FigureColorType.Black
         const pieceType = getFigureTypeByString(symbol.toLowerCase())
-        board.squares[index][file] = {
+        board[index][file] = {
           type: pieceType,
           color: pieceColor,
           file: String.fromCharCode(97 + file),
-          rank: rank
+          rank: rank,
+          moves: []
         }
         file++
       }
     }
   }
+  console.log("loading board:",board,typeof board)
   return board
+}
+
+export function savePositionToFen(board: any): string
+{
+  let fen: string = ''
+  for (let rank = 0; rank < 8; rank++) {
+    let emptySquares = 0
+    for (let file = 0; file < 8; file++) {
+      const figure = board.value[rank][file]
+      if (figure.type === FigureType.ClearBoard) {
+        emptySquares++
+      } else {
+        if (emptySquares) {
+          fen += emptySquares
+          emptySquares = 0
+        }
+        const piece = pieceTypeFromSymbol.find((item) => item.figure === figure.type)!
+        fen += figure.color === FigureColorType.White ? piece.string.toUpperCase() : piece.string
+      }
+    }
+    if (emptySquares) {
+      fen += emptySquares
+    }
+    if (rank < 7) {
+      fen += '/'
+    }
+  }
+  return fen
 }
 
 export function getFigureIndexByFigure(figure: Figure): number {

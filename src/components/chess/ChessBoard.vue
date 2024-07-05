@@ -30,7 +30,7 @@
         <div class="board-info-file">H</div>
       </div>
       <div class="board-container">
-        <div class="board-line" v-for="(line, i) in board.squares" :key="i">
+        <div class="board-line" v-for="(line, i) in board" :key="i">
           <ChessBoardSquare
             v-for="(square, j) in line"
             :key="j"
@@ -47,12 +47,14 @@
       </div>
     </div>
     <div class="board-dev-tools">
-      <button @click="toggleModal">Toggle Modal</button>
       <button @click="toggleAllAttackedSquares">Toggle All AttackedSquares</button>
       <select v-model="attackSquaresColor">
         <option :value="FigureColorType.White">White</option>
         <option :value="FigureColorType.Black">Black</option>
       </select>
+      <button @click="getBoardFEN">Copy board FEN</button>
+      <button @click="pasteBoardFEN">Paste board FEN</button>
+      <button @click="resetBoard">Reset board</button>
     </div>
     <div class="player-row-component player-row-bottom"></div>
   </div>
@@ -69,12 +71,12 @@ import {
   loadPositionFromFen,
   setSquareColor,
   getSquareIndexByCords,
-  removeSquareColor,
   getIndexesByFigureIndex,
   getFigureMoveByIndex,
   addFigureToBoard,
   getColorAndRank,
-  clearBoardFromColors
+  clearBoardFromColors,
+  savePositionToFen
 } from '@/scripts/chess/chessHelpers'
 import {
   generateSlidingMoves,
@@ -96,7 +98,7 @@ const props = defineProps({
 })
 
 const arrayOfSquaresToEdge: NumSquaresToEdge[] = setMoveData()
-const arrayOfStyles = ref([])
+const arrayOfStyles = ref<string[]>([])
 for (var i = 0; i < 64; i++) {
   arrayOfStyles.value.push('')
 }
@@ -104,7 +106,21 @@ let attackedSquaresIndex: SquareAttack[] = []
 let currentPlayer = FigureColorType.White
 let selectedSquare = 64
 
-var board = loadPositionFromFen(props.fen)
+const board = ref<Figure[][]>(
+  Array.from({ length: 8 }, () =>
+    Array.from(
+      { length: 8 },
+      (): Figure => ({
+        type: FigureType.ClearBoard,
+        color: FigureColorType.ClearBoard,
+        file: '',
+        rank: 0,
+        moves: []
+      })
+    )
+  )
+)
+board.value = loadPositionFromFen(props.fen, board.value)
 
 const dragStartSquare = ref(0)
 const dragEndSquare = ref(0)
@@ -155,7 +171,7 @@ function handleDragEnd(event: MouseEvent, figure: Figure) {
   const { x: x, y: y } = getIndexesByFigureIndex(dragEndSquare.value)
   figure.rank = 8 - x
   figure.file = String.fromCharCode(97 + y)
-  board.squares[x][y] = figure
+  board.value[x][y] = figure
   if (currentPlayer === FigureColorType.Black) {
     currentPlayer = FigureColorType.White
   } else {
@@ -252,5 +268,26 @@ function toggleAllAttackedSquares() {
         setSquareColor(square.square, 'red', arrayOfStyles)
       })
   }
+}
+
+function getBoardFEN() {
+  navigator.clipboard.writeText(savePositionToFen(board))
+}
+
+function pasteBoardFEN() {
+  const text = navigator.clipboard.readText()
+  text.then((text) => {
+    board.value = loadPositionFromFen(text, board.value)
+  })
+  console.log(board)
+}
+
+function resetBoard() {
+  board.value = loadPositionFromFen(
+    'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+    board.value
+  )
+  generateMoves()
+  console.log(board.value)
 }
 </script>
