@@ -48,7 +48,7 @@ html, body {
     background-color: white;
     height: 10%;
 }
-.board-wrapper {
+.board-container {
     position: relative;
     width: 100%;
     height: 100%;
@@ -65,7 +65,7 @@ html, body {
   pointer-events: none;
 }
 
-.board-container {
+.board-container-squares {
   position: relative;
   z-index: 1;
 }
@@ -234,4 +234,7 @@ button
 }
 .board-container-row-file .board-info-file:nth-child(odd) {
     color: var(--secondary);
+}
+.player-row-component{
+    display: none;
 }
