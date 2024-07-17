@@ -11,7 +11,6 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
 defineProps({
   modalActive: {
     type: Boolean,

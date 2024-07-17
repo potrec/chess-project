@@ -13,13 +13,13 @@ export const pieceTypeFromSymbol: FenNotationType[] = [
 
 /** 
  * directionIndex: 
- * 0 - górny
- * 1 - dolny
- * 2 - lewy
- * 3 - prawy
- * 4 - lewy górny
- * 6 - prawy górny
- * 5 - prawy dolny
- * 7 - lewy dolny
+ * 0 - up
+ * 1 - down
+ * 2 - left
+ * 3 - right
+ * 4 - left up
+ * 6 - right up
+ * 5 - right down
+ * 7 - left down
 */ 
 export const directionOffsets: number[] = [8, -8, -1, 1, 7, -7, 9, -9]

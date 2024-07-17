@@ -12,6 +12,7 @@ export function generateSlidingMoves(startSquare: number, board: any, arrayOfSqu
   for (let directionIndex = startDirIndex; directionIndex < endDirIndex; directionIndex++) {
     let pinned = 0
     const numberOfSquaresInDirection = getNumberOfSquaresInDirection(startSquare, directionIndex, arrayOfSquaresToEdge)
+
     for (let n = 0; n < numberOfSquaresInDirection; n++) {
       const targetSquare = startSquare + directionOffsets[directionIndex] * (n + 1)
       const figure = getFigureByIndex(targetSquare,board)
@@ -39,6 +40,7 @@ export function generateSlidingMoves(startSquare: number, board: any, arrayOfSqu
       }
     }
   }
+
   return moves
 }
 
@@ -49,11 +51,13 @@ export function generateStraightMoves(startSquare: number, board: any, arrayOfSq
   const {x: x, y: y} = getIndexesByFigureIndex(startSquare)
   const canMoveOnX = [ 2, 1, 1, 1]
   const canMoveOnY = [ 0, 0, 1, -1]
+
   for (let i = 0; i < 4; i++)
   {
     const colorSwitch = selectedFigure.color == FigureColorType.White ? 1 : -1
     canMoveOnX[i] = canMoveOnX[i] * colorSwitch
     canMoveOnY[i] = canMoveOnY[i] * colorSwitch
+
     if(!(x-canMoveOnX[i] < 0 || y-canMoveOnY[i] < 0 || !board.value[x-canMoveOnX[i]] || !board.value[x-canMoveOnX[i]][y-canMoveOnY[i]]))
     {
       const targetSquare = getSquareIndexByCords(x-canMoveOnX[i], y-canMoveOnY[i])
@@ -83,6 +87,7 @@ export function generateStraightMoves(startSquare: number, board: any, arrayOfSq
       }
     }
   }
+
   return moves
 }
 
@@ -113,6 +118,7 @@ export function generateKnightMoves(startSquare: number, board: any, arrayOfSqua
       }
     }
   }
+
   return moves
 }
 
@@ -123,6 +129,7 @@ export function generateKingMoves(startSquare: number, board: any, arrayOfSquare
   const {x: x, y: y} = getIndexesByFigureIndex(startSquare)
   const canMoveOnX = [-1, 1, -1, -1, 0, 0, 1, 1];
   const canMoveOnY = [0, 0, 1, -1, 1, -1, 1, -1];
+
   for (let i = 0; i < 8; i++)
   {
     if(!(x-canMoveOnX[i] < 0 || y-canMoveOnY[i] < 0 || !board.value[x-canMoveOnX[i]] || !board.value[x-canMoveOnX[i]][y-canMoveOnY[i]]))
@@ -171,6 +178,7 @@ export function generateKingMoves(startSquare: number, board: any, arrayOfSquare
       }
     }
   }
+
   return moves
 }
 
@@ -199,5 +207,6 @@ export function checkIfEnemyOnTile(squareIndex: number, board: any, figure: Figu
 {
   const square = getFigureByIndex(squareIndex, board);
   if ( square.type != FigureType.ClearBoard && square.color != FigureColorType.ClearBoard && square.color == figure.color) return true
+  
   return false
 }

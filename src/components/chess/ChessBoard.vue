@@ -43,6 +43,7 @@
               @handleDragStart="handleDragStart"
               @handleDragEnd="handleDragEnd"
               @onClick="onClick"
+              @selectSquare="selectSquare"
               @handleDragEnter="handleDragEnter"
             />
           </div>
@@ -73,7 +74,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { FigureColorType, FigureType, MoveType } from '@/enums/figure'
 import type { Figure, NumSquaresToEdge, SquareAttack } from '@/types/chessTypes'
 import {
@@ -88,7 +89,8 @@ import {
   addFigureToBoard,
   getColorAndRank,
   clearBoardFromColors,
-  savePositionToFen
+  savePositionToFen,
+  getFigureIndexByFigure
 } from '@/scripts/chess/chessHelpers'
 import {
   generateSlidingMoves,
@@ -98,6 +100,7 @@ import {
   deleteUnsafeKingMoves
 } from '@/scripts/chess/chessMoves'
 import ChessBoardSquare from '@/components/chess/ChessBoardSquare.vue'
+
 const props = defineProps({
   playerColor: {
     type: Object,
@@ -111,9 +114,11 @@ const props = defineProps({
 
 const arrayOfSquaresToEdge: NumSquaresToEdge[] = setMoveData()
 const arrayOfStyles = ref<string[]>([])
+
 for (var i = 0; i < 64; i++) {
   arrayOfStyles.value.push('')
 }
+
 let attackedSquaresIndex: SquareAttack[] = []
 let currentPlayer = FigureColorType.White
 let selectedSquare = 64
@@ -139,10 +144,10 @@ const dragEndSquare = ref(0)
 
 generateMoves()
 
-function handleDragStart(event: MouseEvent, figure: number) {
-  console.log('dragStart', figure)
-  dragStartSquare.value = figure
-  dragEndSquare.value = figure
+function handleDragStart(event: MouseEvent, draggedFigure: number) {
+  console.log('dragStart', draggedFigure)
+  dragStartSquare.value = draggedFigure
+  dragEndSquare.value = draggedFigure
 }
 
 function handleDragEnter(event: MouseEvent, figure: Figure, i: number, j: number) {
@@ -150,25 +155,16 @@ function handleDragEnter(event: MouseEvent, figure: Figure, i: number, j: number
   dragEndSquare.value = getSquareIndexByCords(i, j)
 }
 
-function handleDragEnd(event: MouseEvent, figure: Figure) {
-  if (!figure.moves) return 0
-  // if (props.playerColor != currentPlayer) return 0
-  // if (props.playerColor != figure.color) return 0
-  if (dragStartSquare.value === dragEndSquare.value) return 0
-  let targetMoves: number[] = figure.moves.map((move) => move.targetSquare)
-  if (!targetMoves.includes(dragEndSquare.value)) return 0 // todo":play sound or alert the player that he can't move there
-  let startFigure = getFigureByIndex(dragStartSquare.value, board)
-  console.log(dragEndSquare.value)
-  switch (getFigureMoveByIndex(figure, dragEndSquare.value)) {
-    case MoveType.Castling: {
-      const { color, rank } = getColorAndRank(dragEndSquare.value)
-      const offset = dragEndSquare.value < 7 ? 1 : -2
-      const file = dragEndSquare.value < 7 ? 'f' : 'd'
+function handleDragEnd(event: MouseEvent, draggedFigure: Figure) {
+  if (!isValidMove(draggedFigure, dragStartSquare.value, dragEndSquare.value)) return
 
-      deleteFigureFromBoard(board, getFigureByIndex(dragEndSquare.value + offset, board))
-      let rook: Figure = { type: FigureType.Rook, color, file, rank, moves: [] }
-      addFigureToBoard(board, rook)
-      console.log('castling', dragEndSquare.value)
+  handleMove(draggedFigure, dragEndSquare.value)
+}
+
+function handleMove(figure: Figure, location: number) {
+  switch (getFigureMoveByIndex(figure, location)) {
+    case MoveType.Castling: {
+      handleCastling()
       break
     }
     case MoveType.Move:
@@ -179,53 +175,86 @@ function handleDragEnd(event: MouseEvent, figure: Figure) {
       break
   }
 
-  deleteFigureFromBoard(board, startFigure)
-  const { x: x, y: y } = getIndexesByFigureIndex(dragEndSquare.value)
-  figure.rank = 8 - x
-  figure.file = String.fromCharCode(97 + y)
-  board.value[x][y] = figure
-  if (currentPlayer === FigureColorType.Black) {
-    currentPlayer = FigureColorType.White
-  } else {
-    currentPlayer = FigureColorType.Black
-  }
+  updateFigurePositionOnBoard(figure, dragEndSquare.value)
+  toggleCurrentPlayer()
   clearBoardFromColors(arrayOfStyles)
   generateMoves()
 }
 
+function isValidMove(figure: Figure, startSquare: number, endSquare: number): boolean {
+  let targetMoves = figure.moves.map((move) => move.targetSquare)
+
+  return (
+    figure.moves &&
+    currentPlayer === figure.color &&
+    startSquare !== endSquare &&
+    targetMoves.includes(dragEndSquare.value)
+  )
+}
+
+function handleCastling() {
+  const { color, rank } = getColorAndRank(dragEndSquare.value)
+  const offset = dragEndSquare.value < 7 ? 1 : -2
+  const file = dragEndSquare.value < 7 ? 'f' : 'd'
+
+  deleteFigureFromBoard(board, getFigureByIndex(dragEndSquare.value + offset, board))
+
+  let rook: Figure = { type: FigureType.Rook, color, file, rank, moves: [] }
+
+  addFigureToBoard(board, rook)
+  console.log('castling', dragEndSquare.value)
+}
+
+function updateFigurePositionOnBoard(figure: Figure, index: number) {
+  deleteFigureFromBoard(board, figure)
+
+  const { x: x, y: y } = getIndexesByFigureIndex(index)
+  figure.rank = 8 - x
+  figure.file = String.fromCharCode(97 + y)
+
+  board.value[x][y] = figure
+}
+
+function toggleCurrentPlayer() {
+  currentPlayer =
+    currentPlayer === FigureColorType.White ? FigureColorType.Black : FigureColorType.White
+}
+
+function executeMovement() {
+  //updateFigurePositionOnBoard(currentPlayer, index)
+}
+
+function selectSquare(index: number) {
+  console.log('selectSquare', index)
+}
+
 function onClick(figure: Figure, index: number) {
-  //console.log()
+  console.log('onClick from:', getFigureIndexByFigure(figure), 'to:', index)
   if (!figure.moves) {
     return 0
   }
+
   clearBoardFromColors(arrayOfStyles)
+
   if (selectedSquare === index) {
     selectedSquare = 65
     return 0
   }
   selectedSquare = index
-  console.log(figure)
+  const arrayOfColors = ['yellow', 'red', 'light-blue', 'gray']
+
   figure.moves.forEach((move) => {
-    let color = ''
-    if (move.moveType === MoveType.Move) {
-      color = 'yellow'
-    }
-    if (move.moveType === MoveType.Attack) {
-      color = 'red'
-    }
-    if (move.moveType === MoveType.Castling) {
-      color = 'light-blue'
-    }
-    if (move.moveType === MoveType.Pinned) {
-      color = 'gray'
-    }
+    let color = arrayOfColors[move.moveType]
+
     setSquareColor(move.targetSquare, color, arrayOfStyles)
   })
+
   setSquareColor(index, 'purple', arrayOfStyles)
 }
 
 function generateMoves(): void {
   attackedSquaresIndex = []
+
   for (let startSquare = 0; startSquare < 64; startSquare++) {
     let piece = getFigureByIndex(startSquare, board)
     if (piece == null) {
@@ -250,6 +279,7 @@ function generateMoves(): void {
     if (piece.moves == null) {
       continue
     }
+
     piece.moves.map((move) => {
       if (move.moveType !== MoveType.Pinned) {
         attackedSquaresIndex.push({ square: move.targetSquare, attackingFigureColor: piece.color })
@@ -258,6 +288,7 @@ function generateMoves(): void {
   }
   for (let i = 0; i < 64; i++) {
     let piece = getFigureByIndex(i, board)
+
     if (piece == null) {
       continue
     }
@@ -269,10 +300,15 @@ function generateMoves(): void {
 
 const toggleAttackSquares = ref(false)
 const attackSquaresColor = ref(FigureColorType.White)
+
 function toggleAllAttackedSquares() {
-  console.log(attackSquaresColor.value)
-  clearBoardFromColors(arrayOfStyles)
   toggleAttackSquares.value = !toggleAttackSquares.value
+  handleAttackedSquares()
+}
+
+function handleAttackedSquares() {
+  clearBoardFromColors(arrayOfStyles)
+
   if (toggleAttackSquares.value === true) {
     attackedSquaresIndex
       .filter((square) => square.attackingFigureColor === attackSquaresColor.value)
@@ -282,15 +318,21 @@ function toggleAllAttackedSquares() {
   }
 }
 
+watch(attackSquaresColor, () => {
+  handleAttackedSquares()
+})
+
 function getBoardFEN() {
   navigator.clipboard.writeText(savePositionToFen(board))
 }
 
 function pasteBoardFEN() {
   const text = navigator.clipboard.readText()
+
   text.then((text) => {
     board.value = loadPositionFromFen(text, board.value)
   })
+
   console.log(board)
 }
 
@@ -299,7 +341,9 @@ function resetBoard() {
     'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
     board.value
   )
+
   generateMoves()
+
   console.log(board.value)
 }
 </script>

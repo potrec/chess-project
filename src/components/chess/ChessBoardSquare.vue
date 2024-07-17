@@ -7,7 +7,7 @@
     draggable="false"
     @dragenter="emits('handleDragEnter', $event, piece, rowIndex, colIndex)"
     @dragend="emits('handleDragEnd', $event, piece)"
-    @click="emits('onClick', piece, index)"
+    @click="handleClick(piece, index)"
   >
     <img
       class="figure"
@@ -36,6 +36,7 @@ const props = defineProps({
 })
 
 const squareStyle = ref(props.style)
+
 watchEffect(() => {
   squareStyle.value = props.style
 })
@@ -45,8 +46,14 @@ const emits = defineEmits<{
   handleDragEnter: [event: MouseEvent, figure: Figure, i: number, j: number]
   handleDragStart: [event: MouseEvent, figure: number]
   onClick: [figure: Figure, index: number]
+  selectSquare: [index: number]
   testEmit: [number: number]
 }>()
+
+const handleClick = (piece: Figure, index: number) => {
+  emits('onClick', piece, index)
+  emits('selectSquare', index)
+}
 
 const index = ref(getSquareIndexByCords(props.rowIndex, props.colIndex))
 </script>

@@ -1,6 +1,6 @@
 import type { NumSquaresToEdge, Figure } from "@/types/chessTypes"
 import { FigureColorType, FigureType, MoveType } from "@/enums/figure"
-import { reactive, ref, type Ref } from 'vue'
+import { type Ref } from 'vue'
 import { isUpperCase } from "@/helpers/isUpperCase"
 import { pieceTypeFromSymbol } from '@/constants/chess/piece'
 export function getNumberOfSquaresInDirection(startSquare: number, directionIndex: number, arrayOfSquaresToEdge: NumSquaresToEdge[]): number {
@@ -53,6 +53,7 @@ export function getIndexesByFigureIndex(squareIndex: number){
 
 export function setMoveData(): NumSquaresToEdge[] {
   const arrayOfSquaresToEdge: NumSquaresToEdge[] = [];
+
   for (let file = 0; file < 8; file++) {
     for (let rank = 0; rank < 8; rank++) {
       const numNorth: number = 7 - rank;
@@ -90,6 +91,7 @@ export function removeSquareColor(squareIndex: number, arrayOfStyles: Ref<string
 
 export function getFigures(figure: Figure): string {
   let path = '/src/assets/images/figures/Chess_'
+
   switch (figure.type) {
     case FigureType.King:
       path += 'k'
@@ -112,13 +114,15 @@ export function getFigures(figure: Figure): string {
     default:
       return ''
   }
+
   path += figure.color === FigureColorType.White ? 'lt45.png' : 'dt45.png'
   return path
 }
 
-export function getFigureTypeByString(fenSymbol: string): FigureType | undefined {
+export function getFigureTypeByString(fenSymbol: string): FigureType {
   const piece = pieceTypeFromSymbol.find((item) => item.string === fenSymbol)
-  return piece ? piece.figure : undefined
+
+  return piece ? piece.figure : FigureType.ClearBoard
 }
 
 export function deleteFigureFromBoard(board: any, dragStartSquare: Figure) {
@@ -142,6 +146,7 @@ export function loadPositionFromFen(fen: string,board: Figure[][]) {
   let file: number = 0
   let rank: number = 8
   let index: number = 0
+
   for (const symbol of fenBoard) {
     if (symbol === '/') {
       file = 0
@@ -180,6 +185,7 @@ export function loadPositionFromFen(fen: string,board: Figure[][]) {
 export function savePositionToFen(board: any): string
 {
   let fen: string = ''
+
   for (let rank = 0; rank < 8; rank++) {
     let emptySquares = 0
     for (let file = 0; file < 8; file++) {
