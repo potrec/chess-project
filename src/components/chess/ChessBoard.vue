@@ -8,44 +8,56 @@
         <div class="player-row-country-flag">POLAND</div>
       </div>
     </div>
-    <div class="board-container">
-      <div class="board-container-row-info">
-        <div class="board-info-rank">8</div>
-        <div class="board-info-rank">7</div>
-        <div class="board-info-rank">6</div>
-        <div class="board-info-rank">5</div>
-        <div class="board-info-rank">4</div>
-        <div class="board-info-rank">3</div>
-        <div class="board-info-rank">2</div>
-        <div class="board-info-rank">1</div>
-      </div>
-      <div class="board-container-row-file">
-        <div class="board-info-file">A</div>
-        <div class="board-info-file">B</div>
-        <div class="board-info-file">C</div>
-        <div class="board-info-file">D</div>
-        <div class="board-info-file">E</div>
-        <div class="board-info-file">F</div>
-        <div class="board-info-file">G</div>
-        <div class="board-info-file">H</div>
-      </div>
-      <div class="board-container-squares">
-        <div class="board-line" v-for="(line, i) in board" :key="i">
-          <ChessBoardSquare
-            v-for="(square, j) in line"
-            :key="j"
-            :piece="square"
-            :row-index="i"
-            :col-index="j"
-            :style="arrayOfStyles[getSquareIndexByCords(i, j)]"
-            @handleDragStart="handleDragStart"
-            @handleDragEnd="handleDragEnd"
-            @onClick="onClick"
-            @handleDragEnter="handleDragEnter"
-          />
+    <div class="board">
+      <div class="board-container-score"></div>
+      <div class="board-container">
+        <div class="board-container-row-info">
+          <div class="board-info-rank">8</div>
+          <div class="board-info-rank">7</div>
+          <div class="board-info-rank">6</div>
+          <div class="board-info-rank">5</div>
+          <div class="board-info-rank">4</div>
+          <div class="board-info-rank">3</div>
+          <div class="board-info-rank">2</div>
+          <div class="board-info-rank">1</div>
+        </div>
+        <div class="board-container-row-file">
+          <div class="board-info-file">A</div>
+          <div class="board-info-file">B</div>
+          <div class="board-info-file">C</div>
+          <div class="board-info-file">D</div>
+          <div class="board-info-file">E</div>
+          <div class="board-info-file">F</div>
+          <div class="board-info-file">G</div>
+          <div class="board-info-file">H</div>
+        </div>
+        <div class="board-container-squares">
+          <div class="board-line" v-for="(line, i) in board" :key="i">
+            <ChessBoardSquare
+              v-for="(square, j) in line"
+              :key="j"
+              :piece="square"
+              :row-index="i"
+              :col-index="j"
+              :style="arrayOfStyles[getSquareIndexByCords(i, j)]"
+              @handleDragStart="handleDragStart"
+              @handleDragEnd="handleDragEnd"
+              @onClick="onClick"
+              @handleDragEnter="handleDragEnter"
+            />
+          </div>
         </div>
       </div>
+      <div class="board-container-info">
+        <div class="board-time">
+          <div class="board-time-title">Time</div>
+          <div class="board-time-info">00:00:00</div>
+        </div>
+        <div class="board-players-info"></div>
+        <div class="board-history"></div>
+      </div>
     </div>
+
     <div class="board-dev-tools">
       <button @click="toggleAllAttackedSquares">Toggle All AttackedSquares</button>
       <select v-model="attackSquaresColor">
