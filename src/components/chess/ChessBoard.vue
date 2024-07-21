@@ -1,5 +1,6 @@
 <template>
   <div class="main-container">
+    <!-- todo: Create separate component for this -->
     <div class="player-row-component player-row-top">
       <img class="player-row-avatar" src="/public/favicon.ico" />
       <div class="player-row-info">
@@ -11,26 +12,8 @@
     <div class="board">
       <div class="board-container-score"></div>
       <div class="board-container">
-        <div class="board-container-row-info">
-          <div class="board-info-rank">8</div>
-          <div class="board-info-rank">7</div>
-          <div class="board-info-rank">6</div>
-          <div class="board-info-rank">5</div>
-          <div class="board-info-rank">4</div>
-          <div class="board-info-rank">3</div>
-          <div class="board-info-rank">2</div>
-          <div class="board-info-rank">1</div>
-        </div>
-        <div class="board-container-row-file">
-          <div class="board-info-file">A</div>
-          <div class="board-info-file">B</div>
-          <div class="board-info-file">C</div>
-          <div class="board-info-file">D</div>
-          <div class="board-info-file">E</div>
-          <div class="board-info-file">F</div>
-          <div class="board-info-file">G</div>
-          <div class="board-info-file">H</div>
-        </div>
+        <ChessBoardRankInfo />
+        <ChessBoardFileInfo />
         <div class="board-container-squares">
           <div class="board-line" v-for="(line, i) in board" :key="i">
             <ChessBoardSquare
@@ -42,7 +25,7 @@
               :style="arrayOfStyles[getSquareIndexByCords(i, j)]"
               @handleDragStart="handleDragStart"
               @handleDragEnd="handleDragEnd"
-              @onClick="onClick"
+              @showFigureMoves="showFigureMoves"
               @selectSquare="selectSquare"
               @handleDragEnter="handleDragEnter"
             />
@@ -56,6 +39,7 @@
         </div>
         <div class="board-players-info"></div>
         <div class="board-history"></div>
+        <div class="board-info">{{ boardInfo }}</div>
       </div>
     </div>
 
@@ -92,15 +76,10 @@ import {
   savePositionToFen,
   getFigureIndexByFigure
 } from '@/scripts/chess/chessHelpers'
-import {
-  generateSlidingMoves,
-  generateKnightMoves,
-  generateStraightMoves,
-  generateKingMoves,
-  deleteUnsafeKingMoves
-} from '@/scripts/chess/chessMoves'
+import { generateMoves } from '@/scripts/chess/chessMoves'
 import ChessBoardSquare from '@/components/chess/ChessBoardSquare.vue'
-
+import ChessBoardRankInfo from '@/components/chess/ChessBoardRankInfo.vue'
+import ChessBoardFileInfo from '@/components/chess/ChessBoardFileInfo.vue'
 const props = defineProps({
   playerColor: {
     type: Object,
@@ -119,10 +98,10 @@ for (var i = 0; i < 64; i++) {
   arrayOfStyles.value.push('')
 }
 
-let attackedSquaresIndex: SquareAttack[] = []
+let attackedSquaresIndex = ref<SquareAttack[]>([])
 let currentPlayer = FigureColorType.White
-let selectedSquare = 64
-
+let selectedSquare = ref(65)
+let boardInfo = ref('No check found in the board')
 const board = ref<Figure[][]>(
   Array.from({ length: 8 }, () =>
     Array.from(
@@ -138,11 +117,14 @@ const board = ref<Figure[][]>(
   )
 )
 board.value = loadPositionFromFen(props.fen, board.value)
+attackedSquaresIndex.value = generateMoves(
+  board.value,
+  attackedSquaresIndex.value,
+  arrayOfSquaresToEdge
+)
 
 const dragStartSquare = ref(0)
 const dragEndSquare = ref(0)
-
-generateMoves()
 
 function handleDragStart(event: MouseEvent, draggedFigure: number) {
   console.log('dragStart', draggedFigure)
@@ -177,8 +159,8 @@ function handleMove(figure: Figure, location: number) {
 
   updateFigurePositionOnBoard(figure, dragEndSquare.value)
   toggleCurrentPlayer()
-  clearBoardFromColors(arrayOfStyles)
-  generateMoves()
+  clearBoardFromColors(arrayOfStyles.value)
+  generateMoves(board.value, attackedSquaresIndex.value, arrayOfSquaresToEdge)
 }
 
 function isValidMove(figure: Figure, startSquare: number, endSquare: number): boolean {
@@ -228,74 +210,28 @@ function selectSquare(index: number) {
   console.log('selectSquare', index)
 }
 
-function onClick(figure: Figure, index: number) {
+function showFigureMoves(figure: Figure, index: number) {
   console.log('onClick from:', getFigureIndexByFigure(figure), 'to:', index)
   if (!figure.moves) {
     return 0
   }
 
-  clearBoardFromColors(arrayOfStyles)
+  clearBoardFromColors(arrayOfStyles.value)
 
-  if (selectedSquare === index) {
-    selectedSquare = 65
+  if (selectedSquare.value === index) {
+    selectedSquare.value = 65
     return 0
   }
-  selectedSquare = index
+  selectedSquare.value = index
   const arrayOfColors = ['yellow', 'red', 'light-blue', 'gray']
 
   figure.moves.forEach((move) => {
     let color = arrayOfColors[move.moveType]
 
-    setSquareColor(move.targetSquare, color, arrayOfStyles)
+    setSquareColor(move.targetSquare, color, arrayOfStyles.value)
   })
 
-  setSquareColor(index, 'purple', arrayOfStyles)
-}
-
-function generateMoves(): void {
-  attackedSquaresIndex = []
-
-  for (let startSquare = 0; startSquare < 64; startSquare++) {
-    let piece = getFigureByIndex(startSquare, board)
-    if (piece == null) {
-      continue
-    }
-    if (
-      piece.type === FigureType.Bishop ||
-      piece.type === FigureType.Queen ||
-      piece.type === FigureType.Rook
-    ) {
-      piece.moves = generateSlidingMoves(startSquare, board, arrayOfSquaresToEdge)
-    }
-    if (piece.type === FigureType.Knight) {
-      piece.moves = generateKnightMoves(startSquare, board, arrayOfSquaresToEdge)
-    }
-    if (piece.type === FigureType.Pawn) {
-      piece.moves = generateStraightMoves(startSquare, board, arrayOfSquaresToEdge)
-    }
-    if (piece.type === FigureType.King) {
-      piece.moves = generateKingMoves(startSquare, board, arrayOfSquaresToEdge)
-    }
-    if (piece.moves == null) {
-      continue
-    }
-
-    piece.moves.map((move) => {
-      if (move.moveType !== MoveType.Pinned) {
-        attackedSquaresIndex.push({ square: move.targetSquare, attackingFigureColor: piece.color })
-      }
-    })
-  }
-  for (let i = 0; i < 64; i++) {
-    let piece = getFigureByIndex(i, board)
-
-    if (piece == null) {
-      continue
-    }
-    if (piece.type === FigureType.King) {
-      deleteUnsafeKingMoves(i, board, attackedSquaresIndex)
-    }
-  }
+  setSquareColor(index, 'purple', arrayOfStyles.value)
 }
 
 const toggleAttackSquares = ref(false)
@@ -307,13 +243,13 @@ function toggleAllAttackedSquares() {
 }
 
 function handleAttackedSquares() {
-  clearBoardFromColors(arrayOfStyles)
+  clearBoardFromColors(arrayOfStyles.value)
 
   if (toggleAttackSquares.value === true) {
-    attackedSquaresIndex
+    attackedSquaresIndex.value
       .filter((square) => square.attackingFigureColor === attackSquaresColor.value)
       .forEach((square) => {
-        setSquareColor(square.square, 'red', arrayOfStyles)
+        setSquareColor(square.square, 'red', arrayOfStyles.value)
       })
   }
 }
@@ -323,7 +259,7 @@ watch(attackSquaresColor, () => {
 })
 
 function getBoardFEN() {
-  navigator.clipboard.writeText(savePositionToFen(board))
+  navigator.clipboard.writeText(savePositionToFen(board.value))
 }
 
 function pasteBoardFEN() {
@@ -342,7 +278,7 @@ function resetBoard() {
     board.value
   )
 
-  generateMoves()
+  generateMoves(board.value, attackedSquaresIndex.value, arrayOfSquaresToEdge)
 
   console.log(board.value)
 }

@@ -3,7 +3,7 @@ import type { Figure, Move, NumSquaresToEdge, SquareAttack } from "@/types/chess
 import { getFigureByIndex, getNumberOfSquaresInDirection, getSquareIndexByCords, getIndexesByFigureIndex, getFigureIndexByFigure } from "./chessHelpers"
 import { directionOffsets } from "@/constants/chess/piece"
 
-export function generateSlidingMoves(startSquare: number, board: any, arrayOfSquaresToEdge: NumSquaresToEdge[]): Move[] 
+export function generateSlidingMoves(startSquare: number, board: Figure[][], arrayOfSquaresToEdge: NumSquaresToEdge[]): Move[] 
 {
   const selectedFigure = getFigureByIndex(startSquare,board)
   const startDirIndex = selectedFigure.type == FigureType.Bishop ? 4 : 0
@@ -44,7 +44,7 @@ export function generateSlidingMoves(startSquare: number, board: any, arrayOfSqu
   return moves
 }
 
-export function generateStraightMoves(startSquare: number, board: any, arrayOfSquaresToEdge: NumSquaresToEdge[]): Move[]
+export function generateStraightMoves(startSquare: number, board: Figure[][]): Move[]
 {
   const selectedFigure = getFigureByIndex(startSquare,board)
   const moves: Move[] = []
@@ -58,7 +58,7 @@ export function generateStraightMoves(startSquare: number, board: any, arrayOfSq
     canMoveOnX[i] = canMoveOnX[i] * colorSwitch
     canMoveOnY[i] = canMoveOnY[i] * colorSwitch
 
-    if(!(x-canMoveOnX[i] < 0 || y-canMoveOnY[i] < 0 || !board.value[x-canMoveOnX[i]] || !board.value[x-canMoveOnX[i]][y-canMoveOnY[i]]))
+    if(!(x-canMoveOnX[i] < 0 || y-canMoveOnY[i] < 0 || !board[x-canMoveOnX[i]] || !board[x-canMoveOnX[i]][y-canMoveOnY[i]]))
     {
       const targetSquare = getSquareIndexByCords(x-canMoveOnX[i], y-canMoveOnY[i])
       const figure = getFigureByIndex(targetSquare,board)
@@ -91,7 +91,7 @@ export function generateStraightMoves(startSquare: number, board: any, arrayOfSq
   return moves
 }
 
-export function generateKnightMoves(startSquare: number, board: any, arrayOfSquaresToEdge: NumSquaresToEdge[]): Move[]
+export function generateKnightMoves(startSquare: number, board: Figure[][]): Move[]
 {
   const selectedFigure = getFigureByIndex(startSquare,board)
   const moves: Move[] = []
@@ -101,7 +101,7 @@ export function generateKnightMoves(startSquare: number, board: any, arrayOfSqua
 
   for (let i = 0; i < 8; i++)
   {
-    if(!(x-canMoveOnX[i] < 0 || y-canMoveOnY[i] < 0 || !board.value[x-canMoveOnX[i]] || !board.value[x-canMoveOnX[i]][y-canMoveOnY[i]]))
+    if(!(x-canMoveOnX[i] < 0 || y-canMoveOnY[i] < 0 || !board[x-canMoveOnX[i]] || !board[x-canMoveOnX[i]][y-canMoveOnY[i]]))
     {
       const targetSquare = getSquareIndexByCords(x-canMoveOnX[i], y-canMoveOnY[i])
       const figure = getFigureByIndex(targetSquare,board)
@@ -122,7 +122,7 @@ export function generateKnightMoves(startSquare: number, board: any, arrayOfSqua
   return moves
 }
 
-export function generateKingMoves(startSquare: number, board: any, arrayOfSquaresToEdge: NumSquaresToEdge[]): Move[]
+export function generateKingMoves(startSquare: number, board: Figure[][]): Move[]
 {
   const selectedFigure = getFigureByIndex(startSquare,board)
   const moves: Move[] = []
@@ -132,7 +132,7 @@ export function generateKingMoves(startSquare: number, board: any, arrayOfSquare
 
   for (let i = 0; i < 8; i++)
   {
-    if(!(x-canMoveOnX[i] < 0 || y-canMoveOnY[i] < 0 || !board.value[x-canMoveOnX[i]] || !board.value[x-canMoveOnX[i]][y-canMoveOnY[i]]))
+    if(!(x-canMoveOnX[i] < 0 || y-canMoveOnY[i] < 0 || !board[x-canMoveOnX[i]] || !board[x-canMoveOnX[i]][y-canMoveOnY[i]]))
     {
       const targetSquare = getSquareIndexByCords(x-canMoveOnX[i], y-canMoveOnY[i])
       const figure = getFigureByIndex(targetSquare,board)
@@ -182,7 +182,7 @@ export function generateKingMoves(startSquare: number, board: any, arrayOfSquare
   return moves
 }
 
-export function deleteUnsafeKingMoves(startSquare: number,board: any, attackedSquaresIndex: SquareAttack[])
+export function deleteUnsafeKingMoves(startSquare: number,board: Figure[][], attackedSquaresIndex: SquareAttack[])
 {
   const selectedFigure = getFigureByIndex(startSquare,board)
   attackedSquaresIndex = attackedSquaresIndex.filter((element) => element.attackingFigureColor != selectedFigure.color)
@@ -193,20 +193,66 @@ export function deleteUnsafeKingMoves(startSquare: number,board: any, attackedSq
   selectedFigure.moves = selectedFigure.moves.filter((move) => !squaresToDelete.includes(move.targetSquare))
 }
 
-export function checkIfKingSafe(move: Move, board: any): Boolean 
+export function checkIfKingSafe(move: Move, board: Figure[][]): Boolean 
 {
 
 }
 
-export function upgradeFigure(figure: Figure, board: any)
+export function upgradeFigure(figure: Figure, board: Figure[][])
 {
 
 }
 
-export function checkIfEnemyOnTile(squareIndex: number, board: any, figure: Figure): boolean
+export function checkIfEnemyOnTile(squareIndex: number, board: Figure[][], figure: Figure): boolean
 {
   const square = getFigureByIndex(squareIndex, board);
   if ( square.type != FigureType.ClearBoard && square.color != FigureColorType.ClearBoard && square.color == figure.color) return true
   
   return false
+}
+
+export function generateMoves(board: Figure[][], attackedSquaresIndex: SquareAttack[], arrayOfSquaresToEdge: NumSquaresToEdge[]): SquareAttack[] {
+  attackedSquaresIndex = []
+  for (let startSquare = 0; startSquare < 64; startSquare++) {
+    const piece = getFigureByIndex(startSquare, board)
+    if (piece == null) {
+      continue
+    }
+    if (
+      piece.type === FigureType.Bishop ||
+      piece.type === FigureType.Queen ||
+      piece.type === FigureType.Rook
+    ) {
+      piece.moves = generateSlidingMoves(startSquare, board, arrayOfSquaresToEdge)
+    }
+    if (piece.type === FigureType.Knight) {
+      piece.moves = generateKnightMoves(startSquare, board)
+    }
+    if (piece.type === FigureType.Pawn) {
+      piece.moves = generateStraightMoves(startSquare, board)
+    }
+    if (piece.type === FigureType.King) {
+      piece.moves = generateKingMoves(startSquare, board)
+    }
+    if (piece.moves == null) {
+      continue
+    }
+
+    piece.moves.map((move) => {
+      if (move.moveType !== MoveType.Pinned) {
+        attackedSquaresIndex.push({ square: move.targetSquare, attackingFigureColor: piece.color })
+      }
+    })
+  }
+  for (let i = 0; i < 64; i++) {
+    const piece = getFigureByIndex(i, board)
+
+    if (piece == null) {
+      continue
+    }
+    if (piece.type === FigureType.King) {
+      deleteUnsafeKingMoves(i, board, attackedSquaresIndex)
+    }
+  }
+  return attackedSquaresIndex
 }

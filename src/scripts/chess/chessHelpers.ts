@@ -36,20 +36,12 @@ export function getNumberOfSquaresInDirection(startSquare: number, directionInde
   return numberOfSquaresInDirection
 }
 
-export function getFigureByIndex(index: number, board: any): Figure {
-  return board.value[7 - Math.floor(index / 8)][index % 8] ?? null
-}
-
-export function getSquareIndexByCords(x: number ,y: number): number {
-  return 64 - (8 - y) - x * 8
-}
-
-export function getIndexesByFigureIndex(squareIndex: number){
-  return {
-    x: 7 - Math.floor(squareIndex / 8),
-    y: squareIndex % 8
-  }
-}
+export const getFigureByIndex = (index: number, board: Figure[][]): Figure => board[7 - Math.floor(index / 8)][index % 8] ?? null
+export const getSquareIndexByCords = (x: number ,y: number): number => 64 - (8 - y) - x * 8
+export const getIndexesByFigureIndex = (squareIndex: number) => ({
+  x: 7 - Math.floor(squareIndex / 8),
+  y: squareIndex % 8
+});
 
 export function setMoveData(): NumSquaresToEdge[] {
   const arrayOfSquaresToEdge: NumSquaresToEdge[] = [];
@@ -81,12 +73,12 @@ export function setMoveData(): NumSquaresToEdge[] {
 }
 
 
-export function setSquareColor(squareIndex: number, colorClass: string, arrayOfStyles: Ref<string[]>) {
-  arrayOfStyles.value[squareIndex] = colorClass
+export function setSquareColor(squareIndex: number, colorClass: string, arrayOfStyles: string[]) {
+  arrayOfStyles[squareIndex] = colorClass
 }
 
-export function removeSquareColor(squareIndex: number, arrayOfStyles: Ref<string[]>) {
-  arrayOfStyles.value[squareIndex] = ''
+export function removeSquareColor(squareIndex: number, arrayOfStyles: string[]) {
+  arrayOfStyles[squareIndex] = ''
 }
 
 export function getFigures(figure: Figure): string {
@@ -125,7 +117,7 @@ export function getFigureTypeByString(fenSymbol: string): FigureType {
   return piece ? piece.figure : FigureType.ClearBoard
 }
 
-export function deleteFigureFromBoard(board: any, dragStartSquare: Figure) {
+export function deleteFigureFromBoard(board: Figure[][], dragStartSquare: Figure) {
   const clearSquare: Figure = {
     type: FigureType.ClearBoard,
     color: FigureColorType.ClearBoard,
@@ -133,12 +125,12 @@ export function deleteFigureFromBoard(board: any, dragStartSquare: Figure) {
     rank: dragStartSquare.rank,
     moves: []
   };
-  board.value[8-dragStartSquare.rank][dragStartSquare.file.charCodeAt(0) - 97] = clearSquare
+  board[8-dragStartSquare.rank][dragStartSquare.file.charCodeAt(0) - 97] = clearSquare
 }
 
-export function addFigureToBoard(board: any, figure: Figure)
+export function addFigureToBoard(board: Figure[][], figure: Figure)
 {
-  board.value[8-figure.rank][figure.file.charCodeAt(0) - 97] = figure
+  board[8-figure.rank][figure.file.charCodeAt(0) - 97] = figure
 }
 
 export function loadPositionFromFen(fen: string,board: Figure[][]) {
@@ -182,7 +174,7 @@ export function loadPositionFromFen(fen: string,board: Figure[][]) {
   return board
 }
 
-export function savePositionToFen(board: any): string
+export function savePositionToFen(board: Figure[][]): string
 {
   let fen: string = ''
 
@@ -230,7 +222,7 @@ export function getColorAndRank(value: number): { color: FigureColorType; rank: 
     { color: FigureColorType.Black, rank: 8 };
 }
 
-export function clearBoardFromColors(arrayOfStyles: Ref<string[]>) {
+export function clearBoardFromColors(arrayOfStyles: string[]) {
   for (let i = 0; i < 64; i++) {
     removeSquareColor(i, arrayOfStyles)
   }
