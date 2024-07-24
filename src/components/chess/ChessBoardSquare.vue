@@ -5,16 +5,16 @@
     :index="index"
     ref="itemRef"
     draggable="false"
-    @dragenter="emits('handleDragEnter', $event, piece, rowIndex, colIndex)"
-    @dragend="emits('handleDragEnd', $event, piece)"
-    @click="handleClick(piece, index)"
+    @dragenter="emits('handleDragEnter', $event, rowIndex, colIndex)"
+    @dragend="emits('handleFigureDragEnd')"
+    @click="handleClick(index, arrayOfStyles)"
   >
     <img
       class="figure"
       v-if="piece && piece.type !== FigureType.ClearBoard"
       :src="getFigures(props.piece)"
       draggable="true"
-      @dragstart="emits('handleDragStart', $event, index)"
+      @dragstart="emits('handleFigureDragStart', index)"
     />
   </div>
 </template>
@@ -32,7 +32,10 @@ const props = defineProps({
     type: Object as PropType<Figure>,
     required: true
   },
-  style: { type: String, default: '' }
+  board: { type: Object as PropType<Figure[][]> },
+  style: { type: String, default: '' },
+  arrayOfStyles: { type: Array as PropType<string[]> },
+  selectedSquare: { type: Number, default: 65 }
 })
 
 const squareStyle = ref(props.style)
@@ -42,16 +45,16 @@ watchEffect(() => {
 })
 
 const emits = defineEmits<{
-  handleDragEnd: [event: MouseEvent, figure: Figure]
-  handleDragEnter: [event: MouseEvent, figure: Figure, i: number, j: number]
-  handleDragStart: [event: MouseEvent, figure: number]
-  showFigureMoves: [figure: Figure, index: number]
+  handleFigureDragEnd: []
+  handleDragEnter: [event: MouseEvent, i: number, j: number]
+  handleFigureDragStart: [draggedFigure: number]
+  showFigureMoves: [index: number, arrayOfStyles: string[]]
   selectSquare: [index: number]
   testEmit: [number: number]
 }>()
 
-const handleClick = (piece: Figure, index: number) => {
-  emits('showFigureMoves', piece, index)
+const handleClick = (index: number, arrayOfStyles: string[]) => {
+  emits('showFigureMoves', index, arrayOfStyles)
   emits('selectSquare', index)
 }
 
