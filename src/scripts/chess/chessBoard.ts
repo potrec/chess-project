@@ -87,11 +87,13 @@ export function showFigureMoves(index: number, arrayOfStyles: string[]) {
     return 0
   }
   chessBoardStore.selectedSquare = index
-  const arrayOfColors = ['yellow', 'red', 'light-blue', 'gray']
+  const arrayOfColors = ['yellow', 'red', 'light-blue', 'light-blue', 'gray']
 
   figure.moves.forEach((move) => {
     const color = arrayOfColors[move.moveType]
-
+    if (move.moveType == MoveType.Pinned) {
+      console.log('pinned', move, color)
+    }
     setSquareColor(move.targetSquare, color, arrayOfStyles)
   })
 

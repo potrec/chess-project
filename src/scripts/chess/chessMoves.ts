@@ -288,9 +288,10 @@ export function generateMoves(
     }
 
     piece.moves.map((move) => {
-      if (move.moveType !== MoveType.Pinned) {
-        attackedSquaresIndex.push({ square: move.targetSquare, attackingFigureColor: piece.color })
-      }
+      attackedSquaresIndex.push({
+        square: move.targetSquare,
+        attackingFigureColor: piece.color
+      })
     })
   }
   for (let i = 0; i < 64; i++) {
