@@ -31,6 +31,7 @@ export const useChessBoardStore = defineStore('chessBoard', () => {
   const selectedSquare = ref(65)
   const boardInfo = ref('No check found in the board')
   const currentPlayer = ref(FigureColorType.White)
+  const isKingChecked = ref(false)
   const loadPositionFromFEN = (fen: string) => {
     chessBoard.value = loadPositionFromFen(fen, chessBoard.value)
   }
@@ -55,6 +56,7 @@ export const useChessBoardStore = defineStore('chessBoard', () => {
     selectedSquare,
     boardInfo,
     currentPlayer,
+    isKingChecked,
     loadPositionFromFEN,
     generateAttackedSquaresIndex
   }
