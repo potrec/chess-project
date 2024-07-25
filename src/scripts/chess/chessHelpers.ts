@@ -1,9 +1,13 @@
-import type { NumSquaresToEdge, Figure } from "@/types/chessTypes"
-import { FigureColorType, FigureType, MoveType } from "@/enums/figure"
+import type { NumSquaresToEdge, Figure } from '@/types/chessTypes'
+import { FigureColorType, FigureType, MoveType } from '@/enums/figure'
 import { type Ref } from 'vue'
-import { isUpperCase } from "@/helpers/isUpperCase"
+import { isUpperCase } from '@/helpers/isUpperCase'
 import { pieceTypeFromSymbol } from '@/constants/chess/piece'
-export function getNumberOfSquaresInDirection(startSquare: number, directionIndex: number, arrayOfSquaresToEdge: NumSquaresToEdge[]): number {
+export function getNumberOfSquaresInDirection(
+  startSquare: number,
+  directionIndex: number,
+  arrayOfSquaresToEdge: NumSquaresToEdge[]
+): number {
   let numberOfSquaresInDirection = 0
   switch (directionIndex) {
     case 0:
@@ -36,27 +40,28 @@ export function getNumberOfSquaresInDirection(startSquare: number, directionInde
   return numberOfSquaresInDirection
 }
 
-export const getFigureByIndex = (index: number, board: Figure[][]): Figure => board[7 - Math.floor(index / 8)][index % 8] ?? null
-export const getSquareIndexByCords = (x: number ,y: number): number => 64 - (8 - y) - x * 8
+export const getFigureByIndex = (index: number, board: Figure[][]): Figure =>
+  board[7 - Math.floor(index / 8)][index % 8]
+export const getSquareIndexByCords = (x: number, y: number): number => 64 - (8 - y) - x * 8
 export const getIndexesByFigureIndex = (squareIndex: number) => ({
   x: 7 - Math.floor(squareIndex / 8),
   y: squareIndex % 8
-});
+})
 
 export function setMoveData(): NumSquaresToEdge[] {
-  const arrayOfSquaresToEdge: NumSquaresToEdge[] = [];
+  const arrayOfSquaresToEdge: NumSquaresToEdge[] = []
 
   for (let file = 0; file < 8; file++) {
     for (let rank = 0; rank < 8; rank++) {
-      const numNorth: number = 7 - rank;
-      const numSouth: number = rank;
-      const numWest: number = file;
-      const numEast: number = 7 - file;
-      const squareIndex = rank * 8 + file;
-      const minNW: number = Math.min(numNorth, numWest);
-      const minSE: number = Math.min(numSouth, numEast);
-      const minNE: number = Math.min(numNorth, numEast);
-      const minSW: number = Math.min(numSouth, numWest);
+      const numNorth: number = 7 - rank
+      const numSouth: number = rank
+      const numWest: number = file
+      const numEast: number = 7 - file
+      const squareIndex = rank * 8 + file
+      const minNW: number = Math.min(numNorth, numWest)
+      const minSE: number = Math.min(numSouth, numEast)
+      const minNE: number = Math.min(numNorth, numEast)
+      const minSW: number = Math.min(numSouth, numWest)
       arrayOfSquaresToEdge[squareIndex] = {
         numNorth: numNorth,
         numSouth: numSouth,
@@ -66,12 +71,11 @@ export function setMoveData(): NumSquaresToEdge[] {
         minSE: minSE,
         minNE: minNE,
         minSW: minSW
-      };
+      }
     }
   }
-  return arrayOfSquaresToEdge;
+  return arrayOfSquaresToEdge
 }
-
 
 export function setSquareColor(squareIndex: number, colorClass: string, arrayOfStyles: string[]) {
   arrayOfStyles[squareIndex] = colorClass
@@ -124,64 +128,21 @@ export function deleteFigureFromBoard(board: Figure[][], dragStartSquare: Figure
     file: dragStartSquare.file,
     rank: dragStartSquare.rank,
     moves: []
-  };
-  board[8-dragStartSquare.rank][dragStartSquare.file.charCodeAt(0) - 97] = clearSquare
-}
-
-export function addFigureToBoard(board: Figure[][], figure: Figure)
-{
-  board[8-figure.rank][figure.file.charCodeAt(0) - 97] = figure
-}
-
-export function loadPositionFromFen(fen: string,board: Figure[][]) {
-  const fenBoard: string = fen.split(' ')[0]
-  let file: number = 0
-  let rank: number = 8
-  let index: number = 0
-
-  for (const symbol of fenBoard) {
-    if (symbol === '/') {
-      file = 0
-      rank--
-      index++
-    } else {
-      if (Number(symbol)) {
-        for (let i = file; i < file + Number(symbol); i++) {
-          board[index][i] = {
-            type: FigureType.ClearBoard,
-            color: FigureColorType.ClearBoard,
-            file: String.fromCharCode(97 + file),
-            rank: rank,
-            moves: []
-          }
-        }
-        file += Number(symbol)
-      } else {
-        const pieceColor = isUpperCase(symbol) ? FigureColorType.White : FigureColorType.Black
-        const pieceType = getFigureTypeByString(symbol.toLowerCase())
-        board[index][file] = {
-          type: pieceType,
-          color: pieceColor,
-          file: String.fromCharCode(97 + file),
-          rank: rank,
-          moves: []
-        }
-        file++
-      }
-    }
   }
-  console.log("loading board:",board,typeof board)
-  return board
+  board[8 - dragStartSquare.rank][dragStartSquare.file.charCodeAt(0) - 97] = clearSquare
 }
 
-export function savePositionToFen(board: Figure[][]): string
-{
+export function addFigureToBoard(board: Figure[][], figure: Figure) {
+  board[8 - figure.rank][figure.file.charCodeAt(0) - 97] = figure
+}
+
+export function savePositionToFen(board: Figure[][]): string {
   let fen: string = ''
 
   for (let rank = 0; rank < 8; rank++) {
     let emptySquares = 0
     for (let file = 0; file < 8; file++) {
-      const figure = board.value[rank][file]
+      const figure = board[rank][file]
       if (figure.type === FigureType.ClearBoard) {
         emptySquares++
       } else {
@@ -204,26 +165,38 @@ export function savePositionToFen(board: Figure[][]): string
 }
 
 export function getFigureIndexByFigure(figure: Figure): number {
-  return  (figure.rank-1) * 8 + (figure.file.charCodeAt(0) - 97)
+  return (figure.rank - 1) * 8 + (figure.file.charCodeAt(0) - 97)
 }
 
 export function getFigureToString(figure: Figure) {
-  console.log("color: ",figure.color," type: ",figure.type," rank: ",figure.rank, " file: ",figure.file," moves: ",figure.moves)
+  console.log(
+    'color: ',
+    figure.color,
+    ' type: ',
+    figure.type,
+    ' rank: ',
+    figure.rank,
+    ' file: ',
+    figure.file,
+    ' moves: ',
+    figure.moves
+  )
 }
 
-export function getFigureMoveByIndex(figure: Figure, index: number): MoveType | undefined
-{
-  return figure.moves.find(move => move.targetSquare == index)?.moveType
+export function getFigureMoveByIndex(figure: Figure, index: number): MoveType | undefined {
+  return figure.moves.find((move) => move.targetSquare == index)?.moveType
 }
 
 export function getColorAndRank(value: number): { color: FigureColorType; rank: number } {
-  return value < 7? 
-    { color: FigureColorType.White, rank: 1 } :
-    { color: FigureColorType.Black, rank: 8 };
+  return value < 7
+    ? { color: FigureColorType.White, rank: 1 }
+    : { color: FigureColorType.Black, rank: 8 }
 }
 
-export function clearBoardFromColors(arrayOfStyles: string[]) {
+export function clearBoardFromColors(arrayOfStyles: string[]): string[] {
+  console.log('clearBoardFromColors', arrayOfStyles)
   for (let i = 0; i < 64; i++) {
     removeSquareColor(i, arrayOfStyles)
   }
+  return arrayOfStyles
 }
