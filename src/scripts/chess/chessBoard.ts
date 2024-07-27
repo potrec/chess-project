@@ -156,8 +156,10 @@ function handleMove(figure: Figure, location: number) {
 }
 
 function isValidMove(figure: Figure, startSquare: number, endSquare: number): boolean {
-  const targetMoves = figure.moves.map((move) => move.targetSquare)
   const chessBoardStore = useChessBoardStore()
+  const targetMoves = figure.moves
+    .filter((move) => move.moveType !== MoveType.Pinned)
+    .map((move) => move.targetSquare)
   return (
     figure.moves &&
     chessBoardStore.currentPlayer === figure.color &&
