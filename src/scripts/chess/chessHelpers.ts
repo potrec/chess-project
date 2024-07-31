@@ -194,7 +194,6 @@ export function getColorAndRank(value: number): { color: FigureColorType; rank: 
 }
 
 export function clearBoardFromColors(arrayOfStyles: string[]): string[] {
-  console.log('clearBoardFromColors', arrayOfStyles)
   for (let i = 0; i < 64; i++) {
     removeSquareColor(i, arrayOfStyles)
   }

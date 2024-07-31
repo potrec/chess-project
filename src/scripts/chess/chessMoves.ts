@@ -9,6 +9,7 @@ import {
 } from './chessHelpers'
 import { directionOffsets } from '@/constants/chess/piece'
 import { useChessBoardStore } from '@/stores/chessBoard'
+import { ref } from 'vue'
 
 export function generateSlidingMoves(
   startSquare: number,
@@ -19,6 +20,9 @@ export function generateSlidingMoves(
   const startDirIndex = selectedFigure.type == FigureType.Bishop ? 4 : 0
   const endDirIndex = selectedFigure.type == FigureType.Rook ? 4 : 8
   const moves: Move[] = []
+  const move = ref<Move>()
+  const chessBoardStore = useChessBoardStore()
+
   for (let directionIndex = startDirIndex; directionIndex < endDirIndex; directionIndex++) {
     let pinned = 0
     const numberOfSquaresInDirection = getNumberOfSquaresInDirection(
@@ -38,22 +42,24 @@ export function generateSlidingMoves(
         break
       }
       if (figure.color == FigureColorType.ClearBoard) {
-        moves.push({
+        move.value = {
           startSquare,
           targetSquare,
           moveType: pinned == 0 ? MoveType.Move : MoveType.Pinned
-        })
+        }
+        moves.push(move.value)
       } else {
         if (pinned == 0) {
-          const move = { startSquare, targetSquare, moveType: MoveType.Attack }
-          moves.push(move)
+          move.value = { startSquare, targetSquare, moveType: MoveType.Attack }
+          moves.push(move.value)
           pinned += 1
-          const chessBoardStore = useChessBoardStore()
-          chessBoardStore.attackedSquareArray[targetSquare].moves.push(move)
         }
-        moves.push({ startSquare, targetSquare, moveType: MoveType.Pinned })
+        move.value = { startSquare, targetSquare, moveType: MoveType.Pinned }
+        moves.push(move.value)
+        chessBoardStore.attackedSquareArray[targetSquare].moves.push(move.value)
         break
       }
+      chessBoardStore.attackedSquareArray[targetSquare].moves.push(move.value)
     }
   }
 
@@ -218,7 +224,9 @@ export function generateKingMoves(startSquare: number, board: Figure[][]): Move[
       }
     }
   }
+
   chessBoardStore.kingsLocation[kingType].position = startSquare
+
   return moves
 }
 
@@ -272,10 +280,13 @@ export function generateMoves(
   attackedSquaresIndex: SquareAttack[],
   arrayOfSquaresToEdge: NumSquaresToEdge[]
 ): SquareAttack[] {
+  const chessBoardStore = useChessBoardStore()
   attackedSquaresIndex = []
+
+  chessBoardStore.attackedSquareArray.map((square) => {
+    square.moves = []
+  })
   for (let startSquare = 0; startSquare < 64; startSquare++) {
-    const chessBoardStore = useChessBoardStore()
-    chessBoardStore.attackedSquareArray[startSquare].moves = []
     const piece = getFigureByIndex(startSquare, board)
     if (piece == null) {
       continue
