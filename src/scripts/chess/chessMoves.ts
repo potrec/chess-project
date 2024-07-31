@@ -20,8 +20,6 @@ export function generateSlidingMoves(
   const startDirIndex = selectedFigure.type == FigureType.Bishop ? 4 : 0
   const endDirIndex = selectedFigure.type == FigureType.Rook ? 4 : 8
   const moves: Move[] = []
-  const move = ref<Move>()
-  const chessBoardStore = useChessBoardStore()
 
   for (let directionIndex = startDirIndex; directionIndex < endDirIndex; directionIndex++) {
     let pinned = 0
@@ -42,24 +40,20 @@ export function generateSlidingMoves(
         break
       }
       if (figure.color == FigureColorType.ClearBoard) {
-        move.value = {
+        moves.push({
           startSquare,
           targetSquare,
           moveType: pinned == 0 ? MoveType.Move : MoveType.Pinned
-        }
-        moves.push(move.value)
+        })
       } else {
         if (pinned == 0) {
-          move.value = { startSquare, targetSquare, moveType: MoveType.Attack }
-          moves.push(move.value)
+          moves.push({ startSquare, targetSquare, moveType: MoveType.Attack })
           pinned += 1
+        } else {
+          moves.push({ startSquare, targetSquare, moveType: MoveType.Pinned })
         }
-        move.value = { startSquare, targetSquare, moveType: MoveType.Pinned }
-        moves.push(move.value)
-        chessBoardStore.attackedSquareArray[targetSquare].moves.push(move.value)
         break
       }
-      chessBoardStore.attackedSquareArray[targetSquare].moves.push(move.value)
     }
   }
 
@@ -318,6 +312,7 @@ export function generateMoves(
       })
     })
   }
+  setAllAttackedSquaresIndex()
   for (let i = 0; i < 64; i++) {
     const piece = getFigureByIndex(i, board)
 
@@ -334,7 +329,13 @@ export function generateMoves(
 function setAllAttackedSquaresIndex() {
   const chessBoardStore = useChessBoardStore()
   const board = chessBoardStore.chessBoard
+  const attackedSquareArray = chessBoardStore.attackedSquareArray
   for (let startSquare = 0; startSquare < 64; startSquare++) {
     const piece = getFigureByIndex(startSquare, board)
+    if (piece.type === FigureType.ClearBoard) continue
+    piece.moves.forEach((move) => {
+      const targetSquare = move.targetSquare
+      attackedSquareArray[targetSquare].moves.push(move)
+    })
   }
 }
