@@ -8,6 +8,7 @@ import {
   getFigureIndexByFigure
 } from './chessHelpers'
 import { directionOffsets } from '@/constants/chess/piece'
+import { useChessBoardStore } from '@/stores/chessBoard'
 
 export function generateSlidingMoves(
   startSquare: number,
@@ -44,9 +45,11 @@ export function generateSlidingMoves(
         })
       } else {
         if (pinned == 0) {
-          moves.push({ startSquare, targetSquare, moveType: MoveType.Attack })
+          const move = { startSquare, targetSquare, moveType: MoveType.Attack }
+          moves.push(move)
           pinned += 1
-          continue
+          const chessBoardStore = useChessBoardStore()
+          chessBoardStore.attackedSquareArray[targetSquare].moves.push(move)
         }
         moves.push({ startSquare, targetSquare, moveType: MoveType.Pinned })
         break
@@ -157,6 +160,8 @@ export function generateKingMoves(startSquare: number, board: Figure[][]): Move[
   const { x: x, y: y } = getIndexesByFigureIndex(startSquare)
   const canMoveOnX = [-1, 1, -1, -1, 0, 0, 1, 1]
   const canMoveOnY = [0, 0, 1, -1, 1, -1, 1, -1]
+  const chessBoardStore = useChessBoardStore()
+  const kingType = selectedFigure.color === FigureColorType.White ? 0 : 1
 
   for (let i = 0; i < 8; i++) {
     if (
@@ -213,7 +218,7 @@ export function generateKingMoves(startSquare: number, board: Figure[][]): Move[
       }
     }
   }
-
+  chessBoardStore.kingsLocation[kingType].position = startSquare
   return moves
 }
 
@@ -236,7 +241,13 @@ export function deleteUnsafeKingMoves(
   )
 }
 
-export function checkIfKingSafe(move: Move, board: Figure[][]): Boolean {}
+export function checkIfKingChecked(
+  attackedSquaresIndex: SquareAttack[],
+  currentPlayer: FigureColorType
+) {
+  console.log(attackedSquaresIndex)
+  attackedSquaresIndex.map((element) => element.attackingFigureColor === currentPlayer)
+}
 
 export function upgradeFigure(figure: Figure, board: Figure[][]) {}
 
@@ -263,6 +274,8 @@ export function generateMoves(
 ): SquareAttack[] {
   attackedSquaresIndex = []
   for (let startSquare = 0; startSquare < 64; startSquare++) {
+    const chessBoardStore = useChessBoardStore()
+    chessBoardStore.attackedSquareArray[startSquare].moves = []
     const piece = getFigureByIndex(startSquare, board)
     if (piece == null) {
       continue
@@ -305,4 +318,12 @@ export function generateMoves(
     }
   }
   return attackedSquaresIndex
+}
+
+function setAllAttackedSquaresIndex() {
+  const chessBoardStore = useChessBoardStore()
+  const board = chessBoardStore.chessBoard
+  for (let startSquare = 0; startSquare < 64; startSquare++) {
+    const piece = getFigureByIndex(startSquare, board)
+  }
 }

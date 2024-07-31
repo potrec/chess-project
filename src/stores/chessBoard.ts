@@ -1,6 +1,11 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
-import type { Figure, NumSquaresToEdge, SquareAttack } from '@/types/chessTypes'
+import type {
+  Figure,
+  NumSquaresToEdge,
+  SquareAttack,
+  SquareAttackedByFigure
+} from '@/types/chessTypes'
 import { loadPositionFromFen } from '@/scripts/chess/chessBoard'
 import { setMoveData } from '@/scripts/chess/chessHelpers'
 import { FigureColorType, FigureType } from '@/enums/figure'
@@ -32,10 +37,13 @@ export const useChessBoardStore = defineStore('chessBoard', () => {
   const boardInfo = ref('No check found in the board')
   const currentPlayer = ref(FigureColorType.White)
   const isKingChecked = ref(false)
+  const kingsLocation = ref([
+    { position: 4, color: FigureColorType.White },
+    { position: 60, color: FigureColorType.Black }
+  ])
   const loadPositionFromFEN = (fen: string) => {
     chessBoard.value = loadPositionFromFen(fen, chessBoard.value)
   }
-
   const generateAttackedSquaresIndex = () => {
     attackedSquaresIndex.value = generateMoves(
       chessBoard.value,
@@ -43,7 +51,9 @@ export const useChessBoardStore = defineStore('chessBoard', () => {
       arrayOfSquaresToEdge.value
     )
   }
-
+  const attackedSquareArray = ref<SquareAttackedByFigure[]>(
+    Array.from({ length: 64 }, (_, index) => ({ square: index, moves: [] }))
+  )
   return {
     chessBoard,
     attackedSquaresIndex,
@@ -57,6 +67,8 @@ export const useChessBoardStore = defineStore('chessBoard', () => {
     boardInfo,
     currentPlayer,
     isKingChecked,
+    kingsLocation,
+    attackedSquareArray,
     loadPositionFromFEN,
     generateAttackedSquaresIndex
   }

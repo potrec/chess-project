@@ -39,3 +39,8 @@ export type SquareAttack = {
   square: number
   attackingFigureColor: FigureColorType
 }
+
+export type SquareAttackedByFigure = {
+  square: number
+  moves: Move[]
+}
