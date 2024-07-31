@@ -8,6 +8,8 @@ import {
   getFigureIndexByFigure
 } from './chessHelpers'
 import { directionOffsets } from '@/constants/chess/piece'
+import { useChessBoardStore } from '@/stores/chessBoard'
+import { ref } from 'vue'
 
 export function generateSlidingMoves(
   startSquare: number,
@@ -18,6 +20,7 @@ export function generateSlidingMoves(
   const startDirIndex = selectedFigure.type == FigureType.Bishop ? 4 : 0
   const endDirIndex = selectedFigure.type == FigureType.Rook ? 4 : 8
   const moves: Move[] = []
+
   for (let directionIndex = startDirIndex; directionIndex < endDirIndex; directionIndex++) {
     let pinned = 0
     const numberOfSquaresInDirection = getNumberOfSquaresInDirection(
@@ -46,9 +49,9 @@ export function generateSlidingMoves(
         if (pinned == 0) {
           moves.push({ startSquare, targetSquare, moveType: MoveType.Attack })
           pinned += 1
-          continue
+        } else {
+          moves.push({ startSquare, targetSquare, moveType: MoveType.Pinned })
         }
-        moves.push({ startSquare, targetSquare, moveType: MoveType.Pinned })
         break
       }
     }
@@ -157,6 +160,8 @@ export function generateKingMoves(startSquare: number, board: Figure[][]): Move[
   const { x: x, y: y } = getIndexesByFigureIndex(startSquare)
   const canMoveOnX = [-1, 1, -1, -1, 0, 0, 1, 1]
   const canMoveOnY = [0, 0, 1, -1, 1, -1, 1, -1]
+  const chessBoardStore = useChessBoardStore()
+  const kingType = selectedFigure.color === FigureColorType.White ? 0 : 1
 
   for (let i = 0; i < 8; i++) {
     if (
@@ -214,6 +219,8 @@ export function generateKingMoves(startSquare: number, board: Figure[][]): Move[
     }
   }
 
+  chessBoardStore.kingsLocation[kingType].position = startSquare
+
   return moves
 }
 
@@ -236,7 +243,13 @@ export function deleteUnsafeKingMoves(
   )
 }
 
-export function checkIfKingSafe(move: Move, board: Figure[][]): Boolean {}
+export function checkIfKingChecked(
+  attackedSquaresIndex: SquareAttack[],
+  currentPlayer: FigureColorType
+) {
+  console.log(attackedSquaresIndex)
+  attackedSquaresIndex.map((element) => element.attackingFigureColor === currentPlayer)
+}
 
 export function upgradeFigure(figure: Figure, board: Figure[][]) {}
 
@@ -261,7 +274,12 @@ export function generateMoves(
   attackedSquaresIndex: SquareAttack[],
   arrayOfSquaresToEdge: NumSquaresToEdge[]
 ): SquareAttack[] {
+  const chessBoardStore = useChessBoardStore()
   attackedSquaresIndex = []
+
+  chessBoardStore.attackedSquareArray.map((square) => {
+    square.moves = []
+  })
   for (let startSquare = 0; startSquare < 64; startSquare++) {
     const piece = getFigureByIndex(startSquare, board)
     if (piece == null) {
@@ -294,6 +312,7 @@ export function generateMoves(
       })
     })
   }
+  setAllAttackedSquaresIndex()
   for (let i = 0; i < 64; i++) {
     const piece = getFigureByIndex(i, board)
 
@@ -305,4 +324,18 @@ export function generateMoves(
     }
   }
   return attackedSquaresIndex
+}
+
+function setAllAttackedSquaresIndex() {
+  const chessBoardStore = useChessBoardStore()
+  const board = chessBoardStore.chessBoard
+  const attackedSquareArray = chessBoardStore.attackedSquareArray
+  for (let startSquare = 0; startSquare < 64; startSquare++) {
+    const piece = getFigureByIndex(startSquare, board)
+    if (piece.type === FigureType.ClearBoard) continue
+    piece.moves.forEach((move) => {
+      const targetSquare = move.targetSquare
+      attackedSquareArray[targetSquare].moves.push(move)
+    })
+  }
 }

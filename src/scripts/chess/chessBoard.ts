@@ -68,20 +68,18 @@ function executeMovement() {
 }
 
 export function selectSquare(index: number) {
+  const chessBoardStore = useChessBoardStore()
   console.log('selectSquare', index)
+  console.log(chessBoardStore.attackedSquareArray[index])
 }
 
 export function showFigureMoves(index: number, arrayOfStyles: string[]) {
   const chessBoardStore = useChessBoardStore()
-  console.log('test', chessBoardStore.chessBoard, 'index', index)
   const figure = getFigureByIndex(index, chessBoardStore.chessBoard)
-  console.log('figure', figure)
   if (!figure.moves) {
     return 0
   }
-  console.log('onClick from:', getFigureIndexByFigure(figure), 'to:', index)
   arrayOfStyles = clearBoardFromColors(arrayOfStyles)
-  console.log('selected square', chessBoardStore.selectedSquare)
   if (chessBoardStore.selectedSquare === index) {
     chessBoardStore.selectedSquare = 65
     return 0
