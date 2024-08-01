@@ -36,8 +36,9 @@ export function generateSlidingMoves(
         if (pinned == 0) {
           pinned += 1
           continue
+        } else {
+          break
         }
-        break
       }
       if (figure.color == FigureColorType.ClearBoard) {
         moves.push({
@@ -52,7 +53,6 @@ export function generateSlidingMoves(
         } else {
           moves.push({ startSquare, targetSquare, moveType: MoveType.Pinned })
         }
-        break
       }
     }
   }
