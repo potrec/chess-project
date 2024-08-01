@@ -181,7 +181,7 @@ export function generateKingMoves(startSquare: number, board: Figure[][]): Move[
         moves.push({ startSquare, targetSquare, moveType: MoveType.Move })
       } else {
         moves.push({ startSquare, targetSquare, moveType: MoveType.Attack })
-        break
+        continue
       }
     }
   }
@@ -220,7 +220,6 @@ export function generateKingMoves(startSquare: number, board: Figure[][]): Move[
   }
 
   chessBoardStore.kingsLocation[kingType].position = startSquare
-
   return moves
 }
 
