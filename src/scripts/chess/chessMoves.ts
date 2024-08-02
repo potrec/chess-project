@@ -242,12 +242,23 @@ export function deleteUnsafeKingMoves(
   )
 }
 
-export function checkIfKingChecked(
-  attackedSquaresIndex: SquareAttack[],
-  currentPlayer: FigureColorType
-) {
-  console.log(attackedSquaresIndex)
-  attackedSquaresIndex.map((element) => element.attackingFigureColor === currentPlayer)
+export function checkIfKingChecked() {
+  const chessBoardStore = useChessBoardStore()
+  const attackedSquareArray = chessBoardStore.attackedSquareArray
+  const kingLocation =
+    chessBoardStore.kingsLocation[chessBoardStore.currentPlayer == FigureColorType.White ? 0 : 1]
+      .position
+  const king = getFigureByIndex(kingLocation, chessBoardStore.chessBoard)
+  if (attackedSquareArray[kingLocation].moves.length >= 1) {
+    chessBoardStore.isKingChecked = true
+    chessBoardStore.boardInfo = 'Check!'
+    if (king.moves.length == 0) {
+      chessBoardStore.boardInfo = 'Checkmate!'
+    }
+  } else {
+    chessBoardStore.isKingChecked = false
+    chessBoardStore.boardInfo = 'No check found in the board'
+  }
 }
 
 export function upgradeFigure(figure: Figure, board: Figure[][]) {}
@@ -322,6 +333,7 @@ export function generateMoves(
       deleteUnsafeKingMoves(i, board, attackedSquaresIndex)
     }
   }
+  checkIfKingChecked()
   return attackedSquaresIndex
 }
 
