@@ -41,7 +41,9 @@
         </div>
         <div class="board-players-info"></div>
         <div class="board-history"></div>
-        <div class="board-info">{{ chessBoardStore.boardInfo }}</div>
+        <div class="board-info">
+          {{ chessBoardStore.boardInfo }} {{ chessBoardStore.additionalInfo }}
+        </div>
       </div>
     </div>
 
