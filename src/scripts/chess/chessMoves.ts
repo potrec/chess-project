@@ -1,5 +1,11 @@
 import { FigureColorType, FigureType, MoveType } from '@/enums/figure'
-import type { Figure, Move, NumSquaresToEdge, SquareAttack } from '@/types/chessTypes'
+import type {
+  Figure,
+  Move,
+  NumSquaresToEdge,
+  SquareAttack,
+  SquareAttackedByFigure
+} from '@/types/chessTypes'
 import {
   getFigureByIndex,
   getNumberOfSquaresInDirection,
@@ -252,7 +258,7 @@ export function checkIfKingChecked() {
   if (attackedSquareArray[kingLocation].moves.length >= 1) {
     chessBoardStore.isKingChecked = true
     chessBoardStore.boardInfo = 'Check!'
-    if (king.moves.length == 0) {
+    if (king.moves.length == 0 && canKingBeSaved(attackedSquareArray, kingLocation) == false) {
       chessBoardStore.boardInfo = 'Checkmate!'
     }
   } else {
@@ -349,4 +355,20 @@ function setAllAttackedSquaresIndex() {
       attackedSquareArray[targetSquare].moves.push(move)
     })
   }
+}
+
+function canKingBeSaved(attackedSquareArray: SquareAttackedByFigure[], kingLocation: number) {
+  const chessBoardStore = useChessBoardStore()
+  if (attackedSquareArray[kingLocation].moves.length > 1) return false
+  const attackerLocation =
+    attackedSquareArray[attackedSquareArray[kingLocation].moves[0].startSquare]
+  if (attackerLocation.moves.length == 0) return false
+  let info = 'King can be saved by figure on : '
+  attackerLocation.moves.forEach((move) => {
+    if (move.moveType == MoveType.Attack) {
+      info += move.startSquare + ' '
+    }
+  })
+  chessBoardStore.additionalInfo = info
+  return true
 }
