@@ -171,14 +171,12 @@ function handleCastling() {
   const board = chessBoardStore.chessBoard
   const dragEndSquare = chessBoardStore.dragEndSquare
   const { color, rank } = getColorAndRank(dragEndSquare)
-  const offset = dragEndSquare < 7 ? 1 : -2
-  const file = dragEndSquare < 7 ? 'f' : 'd'
-  const rook: Figure = { type: FigureType.Rook, color, file, rank, moves: [] }
+  const offset = dragEndSquare % 8 === 2 ? -2 : 1
+  const file = dragEndSquare % 8 === 2 ? 'd' : 'f'
+  const rook: Figure = { type: FigureType.Rook, color, file, rank, moves: [], hasMoved: true }
 
   deleteFigureFromBoard(board, getFigureByIndex(dragEndSquare + offset, board))
-
   addFigureToBoard(board, rook)
-  console.log('castling', dragEndSquare)
 }
 
 function updateFigurePositionOnBoard(figure: Figure, index: number, board: Figure[][]) {
@@ -187,7 +185,7 @@ function updateFigurePositionOnBoard(figure: Figure, index: number, board: Figur
   const { x: x, y: y } = getIndexesByFigureIndex(index)
   figure.rank = 8 - x
   figure.file = String.fromCharCode(97 + y)
-
+  figure.hasMoved = true
   board[x][y] = figure
 }
 
@@ -210,7 +208,8 @@ export function loadPositionFromFen(fen: string, board: Figure[][]) {
             color: FigureColorType.ClearBoard,
             file: String.fromCharCode(97 + file),
             rank: rank,
-            moves: []
+            moves: [],
+            hasMoved: false
           }
         }
         file += Number(symbol)
@@ -222,7 +221,8 @@ export function loadPositionFromFen(fen: string, board: Figure[][]) {
           color: pieceColor,
           file: String.fromCharCode(97 + file),
           rank: rank,
-          moves: []
+          moves: [],
+          hasMoved: false
         }
         file++
       }

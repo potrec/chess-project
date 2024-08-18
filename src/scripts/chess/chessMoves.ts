@@ -191,6 +191,11 @@ export function generateKingMoves(startSquare: number, board: Figure[][]): Move[
       }
     }
   }
+
+  const kingMoved = selectedFigure.hasMoved
+  const indexes = selectedFigure.color == FigureColorType.White ? [0, 7] : [56, 63]
+  const rookMoved = chessBoardStore.chessBoard
+
   if (
     (startSquare == 4 && selectedFigure.color == FigureColorType.White) ||
     (startSquare == 60 && selectedFigure.color == FigureColorType.Black)

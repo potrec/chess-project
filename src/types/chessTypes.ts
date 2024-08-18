@@ -6,6 +6,7 @@ export type Figure = {
   file: string
   rank: number
   moves: Move[]
+  hasMoved: boolean
 }
 
 export type FenNotationType = {

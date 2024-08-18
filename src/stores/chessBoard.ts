@@ -21,7 +21,8 @@ export const useChessBoardStore = defineStore('chessBoard', () => {
           color: FigureColorType.ClearBoard,
           file: '',
           rank: 0,
-          moves: []
+          moves: [],
+          hasMoved: false
         })
       )
     )
