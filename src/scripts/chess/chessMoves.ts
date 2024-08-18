@@ -253,6 +253,21 @@ export function deleteUnsafeKingMoves(
   )
 }
 
+export function deleteForbiddenKingMoves() {
+  const chessBoardStore = useChessBoardStore()
+  const kingLocation =
+    chessBoardStore.kingsLocation[chessBoardStore.currentPlayer == FigureColorType.White ? 0 : 1]
+      .position
+  const king = getFigureByIndex(kingLocation, chessBoardStore.chessBoard)
+  if (chessBoardStore.isKingChecked == true || king.hasMoved === true) {
+    const kingMovesWithoutCastling = king.moves.filter(
+      (move) => move.moveType !== MoveType.Castling
+    )
+    console.log('movesWithoutCastling', kingMovesWithoutCastling)
+    king.moves = kingMovesWithoutCastling
+  }
+}
+
 export function checkIfKingChecked() {
   const chessBoardStore = useChessBoardStore()
   const attackedSquareArray = chessBoardStore.attackedSquareArray
@@ -270,6 +285,7 @@ export function checkIfKingChecked() {
     chessBoardStore.isKingChecked = false
     chessBoardStore.boardInfo = 'No check found in the board'
   }
+  deleteForbiddenKingMoves()
 }
 
 export function upgradeFigure(figure: Figure, board: Figure[][]) {}

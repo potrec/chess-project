@@ -1,7 +1,7 @@
 <template>
   <div class="main-view">
     <SiteNavigation />
-    <ChessBoard :playerColor="FigureColorType.White" :fen="castling" />
+    <ChessBoard :playerColor="FigureColorType.White" :fen="castling3" />
     <!-- <PlayModal :modalActive="modalActive" /> -->
     <RouterView />
   </div>
@@ -27,6 +27,9 @@ const kingsFEN: string = 'r3k2r/8/8/8/8/8/8/R3K2R'
 const kingMovementTestFEN: string = 'r7/4k3/8/8/8/8/4K3/R3r3'
 const kingSaveTestFEN: string = 'k7/8/4R3/8/8/3rrr2/8/4K3'
 const castling: string = 'r3k2r/p6p/8/8/8/8/P6P/R3K2R'
+const castling1: string = '4k3/8/8/8/8/8/8/RN2K2R'
+const castling2: string = 'r3k2r/8/8/1Q6/8/8/8/4K3'
+const castling3: string = 'r3k2r/8/8/8/5Q2/8/8/4K3'
 </script>
 
 <style scoped></style>
