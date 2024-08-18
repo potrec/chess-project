@@ -127,7 +127,8 @@ export function deleteFigureFromBoard(board: Figure[][], dragStartSquare: Figure
     color: FigureColorType.ClearBoard,
     file: dragStartSquare.file,
     rank: dragStartSquare.rank,
-    moves: []
+    moves: [],
+    hasMoved: false
   }
   board[8 - dragStartSquare.rank][dragStartSquare.file.charCodeAt(0) - 97] = clearSquare
 }

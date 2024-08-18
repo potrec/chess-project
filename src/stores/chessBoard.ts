@@ -21,7 +21,8 @@ export const useChessBoardStore = defineStore('chessBoard', () => {
           color: FigureColorType.ClearBoard,
           file: '',
           rank: 0,
-          moves: []
+          moves: [],
+          hasMoved: false
         })
       )
     )
@@ -41,6 +42,7 @@ export const useChessBoardStore = defineStore('chessBoard', () => {
     { position: 4, color: FigureColorType.White },
     { position: 60, color: FigureColorType.Black }
   ])
+  const additionalInfo = ref('')
   const loadPositionFromFEN = (fen: string) => {
     chessBoard.value = loadPositionFromFen(fen, chessBoard.value)
   }
@@ -69,6 +71,7 @@ export const useChessBoardStore = defineStore('chessBoard', () => {
     isKingChecked,
     kingsLocation,
     attackedSquareArray,
+    additionalInfo,
     loadPositionFromFEN,
     generateAttackedSquaresIndex
   }
